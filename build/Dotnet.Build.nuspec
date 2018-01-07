@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>Dotnet.Build</id>
+    <title>Dotnet.Build</title>
+    <version>0.1.0</version>
+    <description>Just a collection of dotnet-script compatible scripts to be used in build scripts.</description>
+    <authors>Bernhard Richter</authors>
+    <owners>Bernhard Richter</owners>
+    <projectUrl>https://github.com/seesharper/dotnet-build</projectUrl>
+    <licenseUrl>https://opensource.org/licenses/MIT</licenseUrl>   
+    <tags>C# Build Scripting</tags>        
+  </metadata>
+</package>
