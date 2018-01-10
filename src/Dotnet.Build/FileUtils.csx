@@ -1,3 +1,4 @@
+using System.IO.Compression;
 using System.Runtime.CompilerServices;
 
 
@@ -13,6 +14,22 @@ public static class FileUtils
     public static string GetScriptPath([CallerFilePath] string path = null) => path;
     public static string GetScriptFolder([CallerFilePath] string path = null) => Path.GetDirectoryName(path);
     
+
+    public static void Zip(string sourceDirectoryName, string pathToZipfile)
+    {
+        ZipFile.CreateFromDirectory(sourceDirectoryName, pathToZipfile);
+    }
+
+    public static string ReadFile(string pathToFile)
+    {
+        using (var fileStream = new FileStream(pathToFile, FileMode.Open, FileAccess.Read))
+        {
+            using (var reader = new StreamReader(fileStream))
+            {
+                return reader.ReadToEnd();
+            }
+        }
+    }
 
     public static PathType GetPathType(string path)
     {        
@@ -66,8 +83,7 @@ public static class FileUtils
             return;
         }
         NormalizeAttributes(path);
-        // https://stackoverflow.com/questions/29098942/deletion-of-git-repository
-        // http://stackoverflow.com/questions/329355/cannot-delete-directory-with-directory-deletepath-true
+        
         foreach (string directory in Directory.GetDirectories(path))
         {
             RemoveDirectory(directory);
