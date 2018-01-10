@@ -7,7 +7,14 @@ public static class ReleaseNotes
     static ReleaseNotes()
     {
        Logger.Log("Installing Github Changelog Generator ...");
-       Command.Execute("cmd.exe", "/c gem install github_changelog_generator --prerelease --force");         
+       if (Command.Execute("cmd.exe","/c github_changelog_generator --version").ExitCode == 0)
+       {
+           Logger.Log("Github Changelog Generator already installed");
+       }
+       else
+       {
+           Command.Execute("cmd.exe", "/c gem install github_changelog_generator --prerelease --force");         
+       }              
     }
     
     public static void Generate(string pathToChangeLog, string pathToRepository = null)
@@ -40,7 +47,7 @@ public static class ReleaseNotes
                 args = args + $" --since-tag {latestTag}"; 
             }
         }
-        
+
         Command.Execute("cmd.exe",args).EnsureSuccessfulExitCode().Dump();    
     }
 }
