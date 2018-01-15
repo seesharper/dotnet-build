@@ -22,7 +22,7 @@ Copy(Path.Combine(scriptFolder,"Dotnet.Build.nuspec"), Path.Combine(tempFolder,"
 
 string pathToNuGetArtifacts = CreateDirectory(Path.Combine(scriptFolder,"Artifacts","NuGet"));
 NuGet.Pack(tempFolder, pathToNuGetArtifacts);
-return;
+
 string pathToGitHubArtifacts = CreateDirectory(Path.Combine(scriptFolder,"Artifacts","GitHub"));
 ReleaseNotes.Generate(Path.Combine(pathToGitHubArtifacts,"ReleaseNotes.md"));
 
