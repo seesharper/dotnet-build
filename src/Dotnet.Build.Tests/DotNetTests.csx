@@ -12,6 +12,7 @@ await AddTestsFrom<DotNetTests>().AddFilter(m => m.IsDefined(typeof(OnlyThisAttr
 
 public class DotNetTests
 {
+    
     public void ShouldBuildProject()
     {
         using(var projectFolder = new DisposableFolder())
@@ -21,6 +22,7 @@ public class DotNetTests
         }
     }
   
+   [OnlyThis]
     public void ShouldExecuteTests()
     {
         using(var projectFolder = new DisposableFolder())
