@@ -16,3 +16,8 @@ public class DisposableFolder : IDisposable
         FileUtils.RemoveDirectory(Path);
     }
 }
+
+public class OnlyThisAttribute : Attribute
+{
+    
+}

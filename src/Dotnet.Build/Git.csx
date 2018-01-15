@@ -7,8 +7,22 @@ private static string RemoveNewLine(this string value)
     return result;
 }
 
+private static string[] ReadAllLines(this string value)
+{
+    List<string> result = new List<string>();
+    var reader = new StringReader(value);
+    string line;
+    while ((line = reader.ReadLine()) != null)
+    {
+        result.Add(line);
+    }
+    return result.ToArray();
+}
+
 public class GitRepository
 {
+    private static Regex tagMatcher = new Regex(@"^.*refs\/tags\/(.*)$", RegexOptions.Compiled);
+    
     public GitRepository(string path = null)
     {
         Path = path;
@@ -69,6 +83,37 @@ public class GitRepository
         var project = match.Groups[2].Value;
         return new RepositoryInfo(){Owner = owner, ProjectName = project};
     }
+
+    public bool AllTagsPushedToOrigin()
+    {
+        var result = Execute("push --tags --dry-run -n --porcelain").EnsureSuccessfulExitCode().StandardOut;
+        return result.ToLower().Contains("new tag");
+    }
+
+    public bool HasUntrackedFiles()
+    {
+        var result = Execute("ls-files --others --exclude-standard").EnsureSuccessfulExitCode().StandardOut.ReadAllLines();
+        return result.Any();                
+    }
+
+    public bool HasStagedFiles()
+    {
+        return Execute("diff --cached --exit-code").ExitCode != 0;
+    }
+
+
+    public string[] GetRemoteTags()
+    {
+        List<string> result = new List<string>();
+        var lines = Execute("ls-remote --tags --q").EnsureSuccessfulExitCode().StandardOut.ReadAllLines();
+        foreach (var line in lines)
+        {
+            var tag = tagMatcher.Match(line).Groups[1].Value;
+            result.Add(tag);
+        }
+        return result.ToArray();
+    }
+
 
     public bool IsTagCommit()
     {

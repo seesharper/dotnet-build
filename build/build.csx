@@ -16,11 +16,10 @@ var contentFolder = CreateDirectory(tempFolder,"contentFiles","csx","any");
 Copy(Path.Combine(scriptFolder,"..","src","Dotnet.Build"), contentFolder);
 Copy(Path.Combine(scriptFolder,"Dotnet.Build.nuspec"), Path.Combine(tempFolder,"Dotnet.Build.nuspec"));
 
-string pathToNuGetArtifacts = Path.Combine(scriptFolder,"Artifacts","NuGet");
+string pathToNuGetArtifacts = CreateDirectory(Path.Combine(scriptFolder,"Artifacts","NuGet"));
 NuGet.Pack(tempFolder, pathToNuGetArtifacts);
 
-string pathToGitHubArtifacts = Path.Combine(scriptFolder,"Artifacts","GitHub");
-CreateDirectory(pathToGitHubArtifacts);
+string pathToGitHubArtifacts = CreateDirectory(Path.Combine(scriptFolder,"Artifacts","GitHub"));
 ReleaseNotes.Generate(Path.Combine(pathToGitHubArtifacts,"ReleaseNotes.md"));
 
 if(Git.Default.IsTagCommit())
@@ -29,13 +28,6 @@ if(Git.Default.IsTagCommit())
      GitHub.CreateReleaseDraft(pathToGitHubArtifacts);
 }
 
-
-
-
-
-
-// string pathToUnitTests = Path.Combine(scriptFolder,"..","src","ScriptUnit.Tests","ScriptUnitTests.csx");
-// Command.Execute("dotnet", $"script {pathToUnitTests}");
 
 
 

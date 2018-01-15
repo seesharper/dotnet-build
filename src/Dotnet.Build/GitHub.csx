@@ -26,7 +26,9 @@ public static class GitHub
         var accessToken = System.Environment.GetEnvironmentVariable("GITHUB_REPO_TOKEN");
         var client = new GitHubClient(new ProductHeaderValue("dotnet-script"));
         string latestTag = Git.Default.GetLatestTag();
-        var releaseNotes = ReadFile(Path.Combine(githubReleaseFolder,"ReleaseNotes.md"));                        
+
+        var releaseNotes = ReadFile(Path.Combine(githubReleaseFolder,"ReleaseNotes.md"));
+
         var newRelease = new NewRelease(latestTag);    
         newRelease.Name = latestTag;
         newRelease.Body = releaseNotes;
@@ -49,6 +51,6 @@ public static class GitHub
                 RawData = archiveContents
             };
             client.Repository.Release.UploadAsset(createdRelease, assetUpload).Wait();
-        }        
+        }
     }
 }
