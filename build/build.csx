@@ -1,4 +1,5 @@
 #! "netcoreapp2.0"
+#r "nuget:Octokit, 0.27.0"
 #load "../src/Dotnet.Build/Command.csx"
 #load "../src/Dotnet.Build/FileUtils.csx"
 #load "../src/Dotnet.Build/NuGet.csx"
@@ -13,8 +14,11 @@ var scriptFolder = GetScriptFolder();
 var tempFolder = Path.Combine(scriptFolder,"tmp");
 var contentFolder = CreateDirectory(tempFolder,"contentFiles","csx","any");
 
+
 Copy(Path.Combine(scriptFolder,"..","src","Dotnet.Build"), contentFolder);
+
 Copy(Path.Combine(scriptFolder,"Dotnet.Build.nuspec"), Path.Combine(tempFolder,"Dotnet.Build.nuspec"));
+
 
 string pathToNuGetArtifacts = CreateDirectory(Path.Combine(scriptFolder,"Artifacts","NuGet"));
 NuGet.Pack(tempFolder, pathToNuGetArtifacts);
