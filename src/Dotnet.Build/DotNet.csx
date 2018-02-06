@@ -1,11 +1,31 @@
 #load "Command.csx"
+#load "FileUtils.csx"
+
+using static FileUtils;
 
 public static class DotNet
 {
-    public static void Test(string pathToProjectFolder)
+    /// <summary>
+    /// Executes the tests in the given path. The path may the full path to a csproj file 
+    /// that represents a test project or it may be the 
+    /// </summary>
+    /// <param name="path"></param>
+    public static void Test(string path)
     {
-        string pathToTestProject = FindProjectFile(pathToProjectFolder);
-        Command.Execute("dotnet","test " + pathToTestProject + " --configuration Release").EnsureSuccessfulExitCode().Dump();   
+        string pathToProjectFile = FindProjectFile(path);
+        if (pathToProjectFile.EndsWith("csproj", StringComparison.InvariantCultureIgnoreCase))
+        {
+            Command.Execute("dotnet","test " + pathToProjectFile + " --configuration Release").EnsureSuccessfulExitCode().Dump();   
+            return;
+        }
+        
+        if (pathToProjectFile.EndsWith("csx", StringComparison.InvariantCultureIgnoreCase))
+        {
+            Command.Execute("dotnet", $"script {path}").Dump().EnsureSuccessfulExitCode();
+            return;
+        }
+        
+        throw new InvalidOperationException($"No tests found at the path {path}");
     }
     
     public static void Pack(string pathToProjectFolder, string pathToPackageOutputFolder)
@@ -31,6 +51,11 @@ public static class DotNet
 
     private static string FindProjectFile(string pathToProjectFolder)
     {
-        return Directory.GetFiles(pathToProjectFolder, "*.csproj").Single();
-    }
+        if (GetPathType(pathToProjectFolder) == PathType.File)
+        {
+            return pathToProjectFolder;
+        }
+    
+        return Directory.GetFiles(pathToProjectFolder, "*.csproj").SingleOrDefault();
+    }    
 }
