@@ -8,7 +8,7 @@
 
 using static ScriptUnit; 
 
-await 
+return await 
      AddTestsFrom<CommandTests>()
     .AddTestsFrom<DotNetTests>()
     .AddTestsFrom<GitTests>()
