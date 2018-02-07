@@ -6,7 +6,7 @@
 using FluentAssertions;
 using static ScriptUnit; 
 
-await AddTestsFrom<LoggerTests>().Execute();
+//await AddTestsFrom<LoggerTests>().Execute();
 
 public class LoggerTests
 {

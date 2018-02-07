@@ -10,11 +10,11 @@ using FluentAssertions;
 using static ScriptUnit; 
 
 // await AddTestsFrom<GitTests>().Execute();
-await AddTestsFrom<GitTests>().AddFilter(m => m.IsDefined(typeof(OnlyThisAttribute), true)).Execute();
+// await AddTestsFrom<GitTests>().AddFilter(m => m.IsDefined(typeof(OnlyThisAttribute), true)).Execute();
 
 private static GitRepository Init(this DisposableFolder disposableFolder)
 {
-    Command.Execute("git", $"-C {disposableFolder.Path} init").EnsureSuccessfulExitCode();
+    Command.Capture("git", $"-C {disposableFolder.Path} init").EnsureSuccessfulExitCode();
     return Git.Open(disposableFolder.Path);
 }
 

@@ -34,9 +34,9 @@ public class GitRepository
     {
         if (Path == null)
         {
-            return Command.Execute("git", $"{command}");
+            return Command.Capture("git", $"{command}");
         }
-        return Command.Execute("git", $"-C {Path} {command}");
+        return Command.Capture("git", $"-C {Path} {command}");
         
     }
     

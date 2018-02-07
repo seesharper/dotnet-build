@@ -11,13 +11,13 @@ public static class NuGet
         var packageFiles = Directory.GetFiles(packagesFolder, "*.nupkg");        
         foreach(var packageFile in packageFiles)
         {            
-            Command.Execute("nuget", $"push {packageFile} -Source {source} -ApiKey {ApiKey}").Dump();
+            Command.Execute("nuget", $"push {packageFile} -Source {source} -ApiKey {ApiKey}");
         }
     }
 
     public static void Pack(string pathToMetadataFolder, string outputFolder)
     {
         var spec = Directory.GetFiles(pathToMetadataFolder,"*.nuspec").Single();
-        Command.Execute("nuget",$"pack {spec} -OutputDirectory {outputFolder}").EnsureSuccessfulExitCode().Dump();
+        Command.Execute("nuget",$"pack {spec} -OutputDirectory {outputFolder}");
     }
 }

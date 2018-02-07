@@ -15,13 +15,13 @@ public static class DotNet
         string pathToProjectFile = FindProjectFile(path);
         if (pathToProjectFile.EndsWith("csproj", StringComparison.InvariantCultureIgnoreCase))
         {
-            Command.Execute("dotnet","test " + pathToProjectFile + " --configuration Release").EnsureSuccessfulExitCode().Dump();   
+            Command.Execute("dotnet","test " + pathToProjectFile + " --configuration Release");
             return;
         }
         
         if (pathToProjectFile.EndsWith("csx", StringComparison.InvariantCultureIgnoreCase))
         {
-            Command.Execute("dotnet", $"script {path}").Dump().EnsureSuccessfulExitCode();
+            Command.Execute("dotnet", $"script {path}");
             return;
         }
         
@@ -31,21 +31,21 @@ public static class DotNet
     public static void Pack(string pathToProjectFolder, string pathToPackageOutputFolder)
     {
         string pathToProjectFile = FindProjectFile(pathToProjectFolder);
-        Command.Execute("dotnet",$"pack {pathToProjectFile} --configuration Release --output {pathToPackageOutputFolder} ").EnsureSuccessfulExitCode().Dump();   
+        Command.Execute("dotnet",$"pack {pathToProjectFile} --configuration Release --output {pathToPackageOutputFolder} "); 
     }
     
     public static void Build(string pathToProjectFolder)
     {
         string pathToProjectFile = FindProjectFile(pathToProjectFolder);
-        Command.Execute("dotnet","--version").EnsureSuccessfulExitCode().Dump();
-        Command.Execute("dotnet","restore " + pathToProjectFile).EnsureSuccessfulExitCode().Dump();;        
-        Command.Execute("dotnet","build " + pathToProjectFile + " --configuration Release").EnsureSuccessfulExitCode().Dump();   
+        Command.Execute("dotnet","--version");
+        Command.Execute("dotnet","restore " + pathToProjectFile);        
+        Command.Execute("dotnet","build " + pathToProjectFile + " --configuration Release");  
     }
 
     public static void Publish(string pathToProjectFolder)
     {
          string pathToProjectFile = FindProjectFile(pathToProjectFolder);
-         Command.Execute("dotnet","publish " + pathToProjectFile + " --configuration Release").EnsureSuccessfulExitCode().Dump(); 
+         Command.Execute("dotnet","publish " + pathToProjectFile + " --configuration Release");
     }
 
 

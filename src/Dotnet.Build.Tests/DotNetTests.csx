@@ -11,7 +11,7 @@
 using static ScriptUnit;
 using static FileUtils;
 
-await AddTestsFrom<DotNetTests>().AddFilter(m => m.IsDefined(typeof(OnlyThisAttribute), true)).Execute();
+// await AddTestsFrom<DotNetTests>().AddFilter(m => m.IsDefined(typeof(OnlyThisAttribute), true)).Execute();
 
 public class DotNetTests
 {
