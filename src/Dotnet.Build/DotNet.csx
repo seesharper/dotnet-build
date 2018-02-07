@@ -48,7 +48,6 @@ public static class DotNet
          Command.Execute("dotnet","publish " + pathToProjectFile + " --configuration Release");
     }
 
-
     private static string FindProjectFile(string pathToProjectFolder)
     {
         if (GetPathType(pathToProjectFolder) == PathType.File)
