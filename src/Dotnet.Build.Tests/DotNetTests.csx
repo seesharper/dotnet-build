@@ -3,7 +3,7 @@
 #load "../Dotnet.Build/Command.csx"
 #load "../Dotnet.Build/DotNet.csx"
 
-#load "nuget:ScriptUnit, 0.1.1"
+#load "nuget:ScriptUnit, 0.1.3"
 #load "TestUtils.csx"
 
 
