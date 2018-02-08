@@ -14,7 +14,7 @@ using static ScriptUnit;
 
 private static GitRepository Init(this DisposableFolder disposableFolder)
 {
-    Command.Capture("git", $"-C {disposableFolder.Path} init").EnsureSuccessfulExitCode();
+    Command.Capture("git", $"-C {disposableFolder.Path} init").EnsureSuccessfulExitCode().Dump();
     return Git.Open(disposableFolder.Path);
 }
 
