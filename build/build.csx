@@ -17,6 +17,9 @@ var tempFolder = Path.Combine(scriptFolder,"tmp");
 var contentFolder = CreateDirectory(tempFolder,"contentFiles","csx","any");
 
 
+var currentCommitHash = Git.Default.GetCurrentCommitHash();
+WriteLine($"CommitHash {currentCommitHash}");
+
 Copy(Path.Combine(scriptFolder,"..","src","Dotnet.Build"), contentFolder);
 
 Copy(Path.Combine(scriptFolder,"Dotnet.Build.nuspec"), Path.Combine(tempFolder,"Dotnet.Build.nuspec"));
