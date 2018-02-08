@@ -34,9 +34,9 @@ public class GitRepository
     {
         if (Path == null)
         {
-            return Command.Capture("git", $"{command}");
+            return Command.Capture("git", $"{command}").EnsureSuccessfulExitCode();
         }
-        return Command.Capture("git", $"-C {Path} {command}");
+        return Command.Capture("git", $"-C {Path} {command}").EnsureSuccessfulExitCode();
         
     }
     
@@ -86,13 +86,13 @@ public class GitRepository
 
     public bool AllTagsPushedToOrigin()
     {
-        var result = Execute("push --tags --dry-run -n --porcelain").EnsureSuccessfulExitCode().StandardOut;
+        var result = Execute("push --tags --dry-run -n --porcelain").StandardOut;
         return result.ToLower().Contains("new tag");
     }
 
     public bool HasUntrackedFiles()
     {
-        var result = Execute("ls-files --others --exclude-standard").EnsureSuccessfulExitCode().StandardOut.ReadAllLines();
+        var result = Execute("ls-files --others --exclude-standard").StandardOut.ReadAllLines();
         return result.Any();                
     }
 
@@ -105,7 +105,7 @@ public class GitRepository
     public string[] GetRemoteTags()
     {
         List<string> result = new List<string>();
-        var lines = Execute("ls-remote --tags --q").EnsureSuccessfulExitCode().StandardOut.ReadAllLines();
+        var lines = Execute("ls-remote --tags --q").StandardOut.ReadAllLines();
         foreach (var line in lines)
         {
             var tag = tagMatcher.Match(line).Groups[1].Value;
