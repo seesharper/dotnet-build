@@ -17,7 +17,7 @@ var tempFolder = Path.Combine(scriptFolder,"tmp");
 var contentFolder = CreateDirectory(tempFolder,"contentFiles","csx","any");
 
 
-var currentCommitHash = Git.Default.GetCurrentCommitHash();
+var currentCommitHash = Git.Open(scriptFolder).GetCurrentCommitHash();
 WriteLine($"CommitHash {currentCommitHash}");
 
 Copy(Path.Combine(scriptFolder,"..","src","Dotnet.Build"), contentFolder);
