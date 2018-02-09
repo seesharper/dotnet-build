@@ -4,11 +4,11 @@
 #load "../Dotnet.Build/Command.csx"
 #load "../Dotnet.Build/FileUtils.csx"
 #load "nuget:ScriptUnit, 0.1.3"
-#load "TestUtils.csx"
+
 
 using FluentAssertions;
 using static ScriptUnit; 
-
+using static FileUtils;
 //await AddTestsFrom<GitTests>().Execute();
 // await AddTestsFrom<GitTests>().AddFilter(m => m.IsDefined(typeof(OnlyThisAttribute), true)).Execute();
 
@@ -69,8 +69,7 @@ public class GitTests
             repo.HasUntrackedFiles().Should().BeFalse();
         }
     }
-
-    [OnlyThis]
+    
     public void ShouldDetectStagedFiles()
     {
         using (var folder = new DisposableFolder())

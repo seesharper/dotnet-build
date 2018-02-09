@@ -10,10 +10,10 @@ public enum PathType
 }
 
 public static class FileUtils
-{    
+{
     public static string GetScriptPath([CallerFilePath] string path = null) => path;
     public static string GetScriptFolder([CallerFilePath] string path = null) => Path.GetDirectoryName(path);
-    
+
 
     public static void Zip(string sourceDirectoryName, string pathToZipfile)
     {
@@ -32,42 +32,42 @@ public static class FileUtils
     }
 
     public static PathType GetPathType(string path)
-    {        
+    {
         FileAttributes attr = File.GetAttributes(path);
 
         if ((attr & FileAttributes.Directory) == FileAttributes.Directory)
         {
             return PathType.Directory;
         }
-        
+
         return PathType.File;
     }
 
     public static void Copy(string sourcePath, string targetPath)
-    {                       
+    {
         var sourcePathType = GetPathType(sourcePath);
         if (sourcePathType == PathType.File)
         {
-            var targetFolder = Path.GetDirectoryName(targetPath);            
+            var targetFolder = Path.GetDirectoryName(targetPath);
             Directory.CreateDirectory(targetFolder);
             File.Copy(sourcePath, targetPath, true);
-        }   
+        }
         else
         {
             Directory.CreateDirectory(targetPath);
 
-            foreach(var file in Directory.GetFiles(sourcePath))
+            foreach (var file in Directory.GetFiles(sourcePath))
             {
                 File.Copy(file, Path.Combine(targetPath, Path.GetFileName(file)));
             }
-            
-            foreach(var directory in Directory.GetDirectories(sourcePath))
+
+            foreach (var directory in Directory.GetDirectories(sourcePath))
             {
                 Copy(directory, Path.Combine(targetPath, Path.GetFileName(directory)));
-            }   
+            }
         }
     }
-        
+
     public static string CreateDirectory(params string[] paths)
     {
         var pathToDirectory = Path.Combine(paths);
@@ -75,7 +75,7 @@ public static class FileUtils
         Directory.CreateDirectory(pathToDirectory);
         return pathToDirectory;
     }
-    
+
     public static void RemoveDirectory(string path)
     {
         if (!Directory.Exists(path))
@@ -83,7 +83,7 @@ public static class FileUtils
             return;
         }
         NormalizeAttributes(path);
-        
+
         foreach (string directory in Directory.GetDirectories(path))
         {
             RemoveDirectory(directory);
@@ -116,6 +116,23 @@ public static class FileUtils
                 NormalizeAttributes(subdirectoryPath);
             }
             File.SetAttributes(directoryPath, FileAttributes.Normal);
+        }
+    }
+
+    public class DisposableFolder : IDisposable
+    {
+        public DisposableFolder()
+        {
+            var tempFolder = System.IO.Path.GetTempPath();
+            this.Path = System.IO.Path.Combine(tempFolder, System.IO.Path.GetFileNameWithoutExtension(System.IO.Path.GetTempFileName()));
+            Directory.CreateDirectory(Path);
+        }
+
+        public string Path { get; }
+
+        public void Dispose()
+        {
+            FileUtils.RemoveDirectory(Path);
         }
     }
 }
