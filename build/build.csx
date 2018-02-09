@@ -8,6 +8,7 @@
 #load "../src/Dotnet.Build/Git.csx"
 #load "../src/Dotnet.Build/BuildEnvironment.csx"
 #load "../src/Dotnet.Build/GitHub-ReleaseManager.csx"
+#load "../src/Dotnet.Build/Logger.csx"
 
 using static FileUtils;
 using static ChangeLog;
@@ -28,11 +29,12 @@ Copy(Path.Combine(scriptFolder, "Dotnet.Build.nuspec"), Path.Combine(tempFolder,
 string pathToGitHubArtifacts = CreateDirectory(Path.Combine(scriptFolder, "Artifacts", "GitHub"));
 var accessToken = System.Environment.GetEnvironmentVariable("GITHUB_REPO_TOKEN");
 
-//DotNet.Test(Path.Combine(scriptFolder, "..", "src", "DotNet.Build.Tests", "AllTests.csx"));
+DotNet.Test(Path.Combine(scriptFolder, "..", "src", "DotNet.Build.Tests", "AllTests.csx"));
 
 
 if (BuildEnvironment.IsSecure)
 {
+    Logger.Log("Creating release notes");
     string pathToReleaseNotes = Path.Combine(pathToGitHubArtifacts, "ReleaseNotes.md");
     using (StreamWriter sw = new StreamWriter(Path.Combine(pathToGitHubArtifacts, "ReleaseNotes.md")))
     {
