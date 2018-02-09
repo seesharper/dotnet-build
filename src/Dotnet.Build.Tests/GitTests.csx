@@ -9,13 +9,15 @@
 using FluentAssertions;
 using static ScriptUnit; 
 
-// await AddTestsFrom<GitTests>().Execute();
+//await AddTestsFrom<GitTests>().Execute();
 // await AddTestsFrom<GitTests>().AddFilter(m => m.IsDefined(typeof(OnlyThisAttribute), true)).Execute();
 
 private static GitRepository Init(this DisposableFolder disposableFolder)
 {
-    Command.Capture("git", $"-C {disposableFolder.Path} init").EnsureSuccessfulExitCode().Dump();
-    return Git.Open(disposableFolder.Path);
+    Command.Capture("git", $"-C {disposableFolder.Path} init").EnsureSuccessfulExitCode().Dump();    
+    var repo = Git.Open(disposableFolder.Path);
+    repo.Execute("config --local user.email \"email@example.com\"");
+    return repo;
 }
 
 public class GitTests
