@@ -3,7 +3,7 @@
 #load "../Dotnet.Build/Command.csx"
 #load "../Dotnet.Build/DotNet.csx"
 
-#load "nuget:ScriptUnit, 0.1.1"
+#load "nuget:ScriptUnit, 0.1.3"
 #load "TestUtils.csx"
 
 
@@ -11,7 +11,7 @@
 using static ScriptUnit;
 using static FileUtils;
 
-await AddTestsFrom<DotNetTests>().AddFilter(m => m.IsDefined(typeof(OnlyThisAttribute), true)).Execute();
+// await AddTestsFrom<DotNetTests>().AddFilter(m => m.IsDefined(typeof(OnlyThisAttribute), true)).Execute();
 
 public class DotNetTests
 {

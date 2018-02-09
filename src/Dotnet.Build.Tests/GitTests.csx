@@ -3,19 +3,21 @@
 #load "../Dotnet.Build/Git.csx"
 #load "../Dotnet.Build/Command.csx"
 #load "../Dotnet.Build/FileUtils.csx"
-#load "nuget:ScriptUnit, 0.1.1"
+#load "nuget:ScriptUnit, 0.1.3"
 #load "TestUtils.csx"
 
 using FluentAssertions;
 using static ScriptUnit; 
 
-// await AddTestsFrom<GitTests>().Execute();
-await AddTestsFrom<GitTests>().AddFilter(m => m.IsDefined(typeof(OnlyThisAttribute), true)).Execute();
+//await AddTestsFrom<GitTests>().Execute();
+// await AddTestsFrom<GitTests>().AddFilter(m => m.IsDefined(typeof(OnlyThisAttribute), true)).Execute();
 
 private static GitRepository Init(this DisposableFolder disposableFolder)
 {
-    Command.Execute("git", $"-C {disposableFolder.Path} init").EnsureSuccessfulExitCode();
-    return Git.Open(disposableFolder.Path);
+    Command.Capture("git", $"-C {disposableFolder.Path} init").EnsureSuccessfulExitCode().Dump();    
+    var repo = Git.Open(disposableFolder.Path);
+    repo.Execute("config --local user.email \"email@example.com\"");
+    return repo;
 }
 
 public class GitTests

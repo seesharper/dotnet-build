@@ -1,14 +1,14 @@
 #! "netcoreapp2.0"
 #r "nuget: FluentAssertions, 4.19.4"
 #load "../Dotnet.Build/FileUtils.csx"
-#load "nuget:ScriptUnit, 0.1.1"
+#load "nuget:ScriptUnit, 0.1.3"
 #load "TestUtils.csx"
 
 using FluentAssertions;
 using static FileUtils;
 using static ScriptUnit;
 
-await AddTestsFrom<FileUtilsTests>().Execute();
+//await AddTestsFrom<FileUtilsTests>().Execute();
 
 public class FileUtilsTests
 {
