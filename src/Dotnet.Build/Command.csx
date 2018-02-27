@@ -14,7 +14,7 @@ public static class Command
         return new CommandResult(process.ExitCode, process.StandardOutput.ReadToEnd(), process.StandardError.ReadToEnd());
     }
 
-    public static int Execute(string commandPath, string arguments, int success = 0, string workingDirectory = null)
+    public static int Execute(string commandPath, string arguments, string workingDirectory = null,int success = 0)
     {
         var startInformation =  CreateProcessStartInfo(commandPath, arguments, workingDirectory);
         var process = CreateProcess(startInformation);
