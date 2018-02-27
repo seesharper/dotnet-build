@@ -5,18 +5,18 @@ using System.Text.RegularExpressions;
 
 public static class Command
 {                     
-    public static CommandResult Capture(string commandPath, string arguments)
+    public static CommandResult Capture(string commandPath, string arguments, string workingDirectory = null)
     {
-        var startInformation =  CreateProcessStartInfo(commandPath, arguments);
+        var startInformation =  CreateProcessStartInfo(commandPath, arguments, workingDirectory);
         var process = CreateProcess(startInformation);
         process.Start();                        
         process.WaitForExit();   
         return new CommandResult(process.ExitCode, process.StandardOutput.ReadToEnd(), process.StandardError.ReadToEnd());
     }
 
-    public static int Execute(string commandPath, string arguments, int success = 0)
+    public static int Execute(string commandPath, string arguments, int success = 0, string workingDirectory = null)
     {
-        var startInformation =  CreateProcessStartInfo(commandPath, arguments);
+        var startInformation =  CreateProcessStartInfo(commandPath, arguments, workingDirectory);
         var process = CreateProcess(startInformation);
         process.OutputDataReceived += (o,a) => WriteStandardOut(a);
         process.ErrorDataReceived += (o,a) => WriteStandardError(a);        
@@ -48,14 +48,15 @@ public static class Command
 
         return process.ExitCode;
     }
-    private static ProcessStartInfo CreateProcessStartInfo(string commandPath, string arguments)
+    private static ProcessStartInfo CreateProcessStartInfo(string commandPath, string arguments, string workingDirectory)
     {
         var startInformation = new ProcessStartInfo($"{commandPath}");
         startInformation.CreateNoWindow = true;
         startInformation.Arguments =  arguments;
         startInformation.RedirectStandardOutput = true;
         startInformation.RedirectStandardError = true;
-        startInformation.UseShellExecute = false;               
+        startInformation.UseShellExecute = false;  
+        startInformation.WorkingDirectory = workingDirectory ?? Environment.CurrentDirectory;             
         return startInformation;
     }
 
