@@ -90,17 +90,40 @@ public class GitRepository
         return result.ToLower().Contains("new tag");
     }
 
+    //https://stackoverflow.com/questions/2657935/checking-for-a-dirty-index-or-untracked-files-with-git
     public bool HasUntrackedFiles()
     {
-        var result = Execute("ls-files --others --exclude-standard").StandardOut.ReadAllLines();
+        var result = Execute("ls-files --exclude-standard --others").StandardOut.ReadAllLines();
         return result.Any();                
     }
 
     public bool HasStagedFiles()
     {
-        return Execute("diff --cached --exit-code").ExitCode != 0;
+        return Execute("diff-index --quiet --cached HEAD --").ExitCode != 0;
     }
 
+    public bool HasUnstagedFiles()
+    {
+        return Execute("diff-files --quiet").ExitCode != 0;
+    }
+
+    public void RequreCleanWorkingTree()
+    {
+        if (HasStagedFiles())
+        {
+            throw new InvalidOperationException("git repository contains uncomitted staged files");
+        }
+
+        if (HasUnstagedFiles())
+        {
+            throw new InvalidOperationException("git repository contains unstaged files");
+        }
+
+        if (HasUntrackedFiles())
+        {
+            throw new InvalidOperationException("git repository contains untracked files");
+        }
+    }
 
     public string[] GetRemoteTags()
     {

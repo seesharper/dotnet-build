@@ -50,6 +50,7 @@ if (BuildEnvironment.IsSecure)
 
     if (Git.Default.IsTagCommit())
     {
+        Git.Default.RequreCleanWorkingTree();
         await ReleaseManagerFor("seesharper", "dotnet-build", accessToken)
             .CreateRelease(Git.Default.GetLatestTag(), pathToReleaseNotes, Array.Empty<ReleaseAsset>());
         NuGet.Push(pathToNuGetArtifacts);

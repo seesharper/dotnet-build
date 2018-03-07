@@ -7,7 +7,7 @@
 #load "TestUtils.csx"
 
 
-
+using FluentAssertions;
 using static ScriptUnit;
 using static FileUtils;
 
@@ -35,7 +35,7 @@ public class DotNetTests
         }
     }
     
-    [OnlyThis]
+    
     public void ShouldExecuteScriptTests()
     {
         using(var projectFolder = new DisposableFolder())
@@ -52,6 +52,20 @@ public class DotNetTests
         {
             Command.Execute("dotnet",$"new console -o {projectFolder.Path}");
             DotNet.Publish(projectFolder.Path);
+        }
+    }
+
+    [OnlyThis]
+    public void ShouldPublishToGivenFolder()
+    {
+        using(var projectFolder = new DisposableFolder())
+        {
+            using(var outputFolder = new DisposableFolder())
+            {
+                Command.Execute("dotnet",$"new console -o {projectFolder.Path}");
+                DotNet.Publish(projectFolder.Path, outputFolder.Path);
+                Directory.GetFiles(outputFolder.Path, "*.dll").Should().NotBeEmpty();
+            }
         }
     }
 }

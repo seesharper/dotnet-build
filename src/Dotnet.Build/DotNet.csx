@@ -42,10 +42,15 @@ public static class DotNet
         Command.Execute("dotnet","build " + pathToProjectFile + " --configuration Release");  
     }
 
-    public static void Publish(string pathToProjectFolder)
+    public static void Publish(string pathToProjectFolder, string outputFolder = null)
     {
          string pathToProjectFile = FindProjectFile(pathToProjectFolder);
-         Command.Execute("dotnet","publish " + pathToProjectFile + " --configuration Release");
+         var args = $"publish {pathToProjectFile} --configuration Release";
+         if (!string.IsNullOrWhiteSpace(outputFolder))
+         {
+             args = args + $" --output {outputFolder}";
+         }
+         Command.Execute("dotnet", args);
     }
 
     private static string FindProjectFile(string pathToProjectFolder)
