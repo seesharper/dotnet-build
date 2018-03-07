@@ -3,6 +3,7 @@
 #load "../Dotnet.Build/Git.csx"
 #load "../Dotnet.Build/Command.csx"
 #load "../Dotnet.Build/FileUtils.csx"
+#load "TestUtils.csx"
 #load "nuget:ScriptUnit, 0.1.3"
 
 
@@ -69,13 +70,13 @@ public class GitTests
             repo.HasUntrackedFiles().Should().BeFalse();
         }
     }
+        
     
     public void ShouldDetectStagedFiles()
     {
         using (var folder = new DisposableFolder())
         {            
-            var repo = folder.Init();
-            repo.HasStagedFiles().Should().BeFalse();
+            var repo = folder.Init();            
             File.Create(Path.Combine(folder.Path,"README.MD")).Close();            
             repo.Execute("add .");
             repo.HasStagedFiles().Should().BeTrue();
@@ -83,7 +84,20 @@ public class GitTests
             repo.HasStagedFiles().Should().BeFalse();
         }
     }
-
+    [OnlyThis]
+    public void ShouldDetectUnstagedFiles()
+    {
+        using (var folder = new DisposableFolder())
+        {            
+            var repo = folder.Init();            
+            File.Create(Path.Combine(folder.Path,"README.MD")).Close();                        
+            repo.Execute("add .");
+            repo.Execute("commit -m \"Added file \"");
+            repo.HasUnstagedFiles().Should().BeFalse();
+            File.WriteAllText(Path.Combine(folder.Path,"README.MD"),"TEST");
+            repo.HasUnstagedFiles().Should().BeTrue();         
+        }
+    }
     public void ShouldGetRemoteTags()
     {
         
