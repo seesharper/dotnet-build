@@ -11,7 +11,16 @@ public static class NuGet
         var packageFiles = Directory.GetFiles(packagesFolder, "*.nupkg");        
         foreach(var packageFile in packageFiles)
         {            
-            Command.Execute("nuget", $"push {packageFile} -Source {source} -ApiKey {ApiKey}");
+            Command.Execute("nuget", $"push {packageFile} -Source {source} -ApiKey {ApiKey}");           
+        }
+    }
+
+    public static void TryPush(string packagesFolder, string source = DefaultSource)
+    {
+        var packageFiles = Directory.GetFiles(packagesFolder, "*.nupkg");        
+        foreach(var packageFile in packageFiles)
+        {            
+            Command.Capture("nuget", $"push {packageFile} -Source {source} -ApiKey {ApiKey}").Dump();           
         }
     }
 
