@@ -1,3 +1,5 @@
+#r "nuget:Microsoft.DotNet.PlatformAbstractions, 2.0.3"
+using System.Runtime.InteropServices;
 public static class BuildEnvironment
 {
     /// <summary>
@@ -23,4 +25,22 @@ public static class BuildEnvironment
     /// </summary>
     /// <returns></returns>
     public static string ChocolateyApiKey = System.Environment.GetEnvironmentVariable("CHOCOLATEY_APIKEY");
+
+    /// <summary>
+    /// Gets a value that indicates if we are running on Windows.
+    /// </summary>
+    /// <returns>true if we are running on Windows, otherwise false.</returns>
+    public static bool IsWindows => RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+
+    /// <summary>
+    /// Gets a value that indicates if we are running on Linux.
+    /// </summary>
+    /// <returns>true if we are running on Linux, otherwise false.</returns>
+    public static bool IsLinux => RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
+
+    /// <summary>
+    /// Gets a value that indicates if we are running on OSX.
+    /// </summary>
+    /// <returns>true if we are running on OSX, otherwise false.</returns>
+    public static bool IsOSX => RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
 }
