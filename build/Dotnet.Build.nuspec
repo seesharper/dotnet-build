@@ -3,7 +3,7 @@
   <metadata>
     <id>Dotnet.Build</id>
     <title>Dotnet.Build</title>
-    <version>0.2.6</version>
+    <version>0.2.7</version>
     <description>Just a collection of dotnet-script compatible scripts to be used in build scripts.</description>
     <authors>Bernhard Richter</authors>
     <owners>Bernhard Richter</owners>
@@ -12,6 +12,7 @@
     <tags>C# Build Scripting</tags>
     <dependencies>
       <dependency id="Octokit" version="0.27.0" />    
+      <dependency id="Microsoft.DotNet.PlatformAbstractions" version="2.0.3" />    
     </dependencies>
   </metadata>
 </package>
