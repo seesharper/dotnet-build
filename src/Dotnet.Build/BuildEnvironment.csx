@@ -18,4 +18,9 @@ public static class BuildEnvironment
     /// <returns></returns>
     public static string NuGetApiKey => System.Environment.GetEnvironmentVariable("NUGET_APIKEY");
     
+    /// <summary>
+    /// Gets the Chocolatey API key used to push packages to Chocolatey.
+    /// </summary>
+    /// <returns></returns>
+    public static string ChocolateyApiKey = System.Environment.GetEnvironmentVariable("CHOCOLATEY_APIKEY");
 }
