@@ -41,16 +41,9 @@ public static class ReleaseManagement
 
             if (existingRelease != null)
             {
-                var releaseUpdate = new ReleaseUpdate();
-                if (string.IsNullOrEmpty(existingRelease.Body))
-                {
-                    releaseUpdate.Body = releaseNotes;
-                }
-
-                if (string.IsNullOrEmpty(existingRelease.Name))
-                {
-                    releaseUpdate.Name = tag;
-                }
+                var releaseUpdate = new ReleaseUpdate();                
+                releaseUpdate.Body = releaseNotes;                
+                releaseUpdate.Name = tag;
 
                 await client.Repository.Release.Edit(_owner, _repository, existingRelease.Id, releaseUpdate);
                 await UploadReleaseAssets(releaseAssets, client, existingRelease);

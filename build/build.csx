@@ -1,6 +1,6 @@
 #! "netcoreapp2.0"
 #r "nuget:Octokit, 0.27.0"
-#load "nuget:github-changelog, 0.1.0"
+#load "nuget:github-changelog, 0.1.4"
 #load "../src/Dotnet.Build/Command.csx"
 #load "../src/Dotnet.Build/DotNet.csx"
 #load "../src/Dotnet.Build/FileUtils.csx"
@@ -38,15 +38,14 @@ if (BuildEnvironment.IsSecure)
 {
     Logger.Log("Creating release notes");
     string pathToReleaseNotes = Path.Combine(pathToGitHubArtifacts, "ReleaseNotes.md");
-    using (StreamWriter sw = new StreamWriter(Path.Combine(pathToGitHubArtifacts, "ReleaseNotes.md")))
+    
+    var generator = ChangeLogFrom("seesharper", "dotnet-build", BuildEnvironment.GitHubAccessToken).SinceLatestTag();
+    if (!Git.Default.IsTagCommit())
     {
-        var generator = ChangeLogFrom("seesharper", "dotnet-build", BuildEnvironment.GitHubAccessToken).SinceLatestTag();
-        if (!Git.Default.IsTagCommit())
-        {
-            generator = generator.IncludeUnreleased();
-        }
-        await generator.Generate(sw);
+        generator = generator.IncludeUnreleased();
     }
+    await generator.Generate(pathToReleaseNotes);
+
 
     if (Git.Default.IsTagCommit())
     {
