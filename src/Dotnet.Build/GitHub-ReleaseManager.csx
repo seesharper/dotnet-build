@@ -22,29 +22,55 @@ public static class ReleaseManagement
             this._accessToken = accessToken;
         }
 
+
+
+
         public async Task CreateRelease(string tag, string pathToReleaseNotes, ReleaseAsset[] releaseAssets)
         {
             var client = new GitHubClient(new ProductHeaderValue(_repository));
             var tokenAuth = new Credentials(_accessToken);
             client.Credentials = tokenAuth;
 
-            var allReleases = await client.Repository.Release.GetAll(_owner, _repository);
-                        
-            if (allReleases.Any(r => r.Name == tag))
-            {
-                return;
-            }
+
+
 
             var releaseNotes = ReadFile(pathToReleaseNotes);
+            var allReleases = await client.Repository.Release.GetAll(_owner, _repository);
 
-            var newRelease = new NewRelease(tag);
-            newRelease.Name = tag;
-            newRelease.Body = releaseNotes;
-            newRelease.Draft = false;
-            newRelease.Prerelease = tag.Contains("-");
+            var existingRelease = allReleases.SingleOrDefault(r => r.TagName == tag);
 
-            var createdRelease = client.Repository.Release.Create(_owner, _repository, newRelease).Result;
+            if (existingRelease != null)
+            {
+                var releaseUpdate = new ReleaseUpdate();
+                if (string.IsNullOrEmpty(existingRelease.Body))
+                {
+                    releaseUpdate.Body = releaseNotes;
+                }
 
+                if (string.IsNullOrEmpty(existingRelease.Name))
+                {
+                    releaseUpdate.Name = tag;
+                }
+
+                await client.Repository.Release.Edit(_owner, _repository, existingRelease.Id, releaseUpdate);
+                await UploadReleaseAssets(releaseAssets, client, existingRelease);
+            }
+            else
+            {
+                 var newRelease = new NewRelease(tag);
+                newRelease.Name = tag;
+                newRelease.Body = releaseNotes;
+                newRelease.Draft = false;
+                newRelease.Prerelease = tag.Contains("-");
+
+                var createdRelease = client.Repository.Release.Create(_owner, _repository, newRelease).Result;
+
+                await UploadReleaseAssets(releaseAssets, client, createdRelease);
+            }           
+        }
+
+        private static async Task UploadReleaseAssets(ReleaseAsset[] releaseAssets, GitHubClient client, Release release)
+        {
             foreach (var releaseAsset in releaseAssets)
             {
                 var archiveContents = File.OpenRead(releaseAsset.Path);
@@ -54,7 +80,7 @@ public static class ReleaseManagement
                     ContentType = releaseAsset.ContentType,
                     RawData = archiveContents
                 };
-                await client.Repository.Release.UploadAsset(createdRelease, assetUpload);
+                await client.Repository.Release.UploadAsset(release, assetUpload);
             }
         }
     }

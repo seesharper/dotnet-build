@@ -4,14 +4,20 @@
 #load "../Dotnet.Build.Tests/DotNetTests.csx"
 #load "../Dotnet.Build.Tests/LoggerTests.csx"
 #load "../Dotnet.Build.Tests/FileUtilsTests.csx"
+#load "../Dotnet.Build.Tests/GitHub-ReleaseManagerTests.csx"
+#load "../Dotnet.Build/BuildEnvironment.csx"
 #load "nuget:ScriptUnit, 0.1.3"
 
 using static ScriptUnit; 
 
-return await 
-     AddTestsFrom<CommandTests>()
+var testRunner = AddTestsFrom<CommandTests>()
     .AddTestsFrom<DotNetTests>()
     .AddTestsFrom<GitTests>()
     .AddTestsFrom<LoggerTests>()
-    .AddTestsFrom<FileUtilsTests>()
-    .Execute();
+    .AddTestsFrom<FileUtilsTests>();
+if (BuildEnvironment.IsSecure)
+{
+    testRunner = testRunner.AddTestsFrom<ReleaseManagerTests>();
+}        
+
+return await testRunner.Execute();
