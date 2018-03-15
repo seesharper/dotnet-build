@@ -18,7 +18,7 @@ artifacts:
 
 test: off
 environment:
-    IS_SECURE_BUILDENVIRONM∥ENT:
+    IS_SECURE_BUILDENVIRONMENT:
         secure: xYC5jpSucUdHr8YwfxWefw==
     GITHUB_REPO_TOKEN:
         secure: FSPXTPuTgFMaZA7DubJoX217SkWhFLN2BGqCCi4gBux967eFtwkhbrafm7ay8cP2

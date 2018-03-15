@@ -13,7 +13,7 @@ using static FileUtils;
 using static ScriptUnit;
 
 // await AddTestsFrom<ReleaseManagerTests>().AddFilter(m => m.IsDefined(typeof(OnlyThisAttribute), true)).Execute();
-// await AddTestsFrom<ReleaseManagerTests>().Execute();
+await AddTestsFrom<ReleaseManagerTests>().Execute();
 
 public class ReleaseManagerTests
 {
@@ -40,31 +40,7 @@ public class ReleaseManagerTests
     }
 
    
-    public async Task ShouldUpdateReleaseBodyIfEmpty()
-    {
-        var accessToken = System.Environment.GetEnvironmentVariable("GITHUB_REPO_TOKEN");
-        var client = CreateClient();
-        await DeleteAllReleases(client);
-
-        var newRelease = new NewRelease("0.1.0");
-        newRelease.Name = "Release Name";
-        await client.Repository.Release.Create(Owner, Repository, newRelease);
-
-        using (var disposableFolder = new DisposableFolder())
-        {
-            var pathToReleaseNotes = Path.Combine(disposableFolder.Path, "ReleaseNotes.md");
-            File.WriteAllText(pathToReleaseNotes, "This is some release notes");
-            await ReleaseManagerFor(Owner, Repository, accessToken).CreateRelease("0.1.0", pathToReleaseNotes, new[] { new ZipReleaseAsset(pathToReleaseNotes) });
-        }
-        
-        var latestRelease = await client.Repository.Release.GetLatest(Owner, Repository);
-        latestRelease.Name.Should().Be("Release Name");
-        latestRelease.Body.Should().Be("This is some release notes");
-        
-    }
-
-   
-    public async Task ShouldNotUpdateReleaseBodyIfNotEmpty()
+    public async Task ShouldUpdateRelease()
     {
         var accessToken = System.Environment.GetEnvironmentVariable("GITHUB_REPO_TOKEN");
         var client = CreateClient();
@@ -83,60 +59,11 @@ public class ReleaseManagerTests
         }
         
         var latestRelease = await client.Repository.Release.GetLatest(Owner, Repository);
-        latestRelease.Name.Should().Be("Release Name");
-        latestRelease.Body.Should().Be("Release Body");
-        
-    }
-     
-     
-     public async Task ShouldUpdateNameIfEmpty()
-    {
-        var accessToken = System.Environment.GetEnvironmentVariable("GITHUB_REPO_TOKEN");
-        var client = CreateClient();
-        await DeleteAllReleases(client);
-
-        var newRelease = new NewRelease("0.1.0");
-        newRelease.Name = "";
-        newRelease.Body = "This is some release notes";
-        await client.Repository.Release.Create(Owner, Repository, newRelease);
-
-        using (var disposableFolder = new DisposableFolder())
-        {
-            var pathToReleaseNotes = Path.Combine(disposableFolder.Path, "ReleaseNotes.md");
-            File.WriteAllText(pathToReleaseNotes, "This is some release notes");
-            await ReleaseManagerFor(Owner, Repository, accessToken).CreateRelease("0.1.0", pathToReleaseNotes, new[] { new ZipReleaseAsset(pathToReleaseNotes) });
-        }
-        
-        var latestRelease = await client.Repository.Release.GetLatest(Owner, Repository);
         latestRelease.Name.Should().Be("0.1.0");
         latestRelease.Body.Should().Be("This is some release notes");
         
     }
 
-    
-    public async Task ShouldNotUpdateNameIfNotEmpty()
-    {
-        var accessToken = System.Environment.GetEnvironmentVariable("GITHUB_REPO_TOKEN");
-        var client = CreateClient();
-        await DeleteAllReleases(client);
-
-        var newRelease = new NewRelease("0.1.0");
-        newRelease.Name = "Release Name";
-        newRelease.Body = "This is some release notes";
-        await client.Repository.Release.Create(Owner, Repository, newRelease);
-
-        using (var disposableFolder = new DisposableFolder())
-        {
-            var pathToReleaseNotes = Path.Combine(disposableFolder.Path, "ReleaseNotes.md");
-            File.WriteAllText(pathToReleaseNotes, "This is some release notes");
-            await ReleaseManagerFor(Owner, Repository, accessToken).CreateRelease("0.1.0", pathToReleaseNotes, new[] { new ZipReleaseAsset(pathToReleaseNotes) });
-        }
-        
-        var latestRelease = await client.Repository.Release.GetLatest(Owner, Repository);
-        latestRelease.Name.Should().Be("Release Name");
-        latestRelease.Body.Should().Be("This is some release notes");
-        
-    }
 
 
     private static GitHubClient CreateClient()
