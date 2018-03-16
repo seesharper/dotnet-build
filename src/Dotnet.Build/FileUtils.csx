@@ -31,6 +31,18 @@ public static class FileUtils
         }
     }
 
+    public static void WriteFile(string pathToFile, string content)
+    {
+        using (var fileStream = new FileStream(pathToFile, FileMode.Create))
+        {
+            using (var writer = new StreamWriter(fileStream))
+            {
+                writer.Write(content);
+            }
+        }
+
+    }
+
     public static PathType GetPathType(string path)
     {
         FileAttributes attr = File.GetAttributes(path);
