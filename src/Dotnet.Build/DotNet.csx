@@ -28,10 +28,10 @@ public static class DotNet
         throw new InvalidOperationException($"No tests found at the path {path}");
     }
     
-    public static void Pack(string pathToProjectFolder, string pathToPackageOutputFolder)
+    public static void Pack(string pathToProjectFolder, string pathToPackageOutputFolder, string additionalArguments = "")
     {
         string pathToProjectFile = FindProjectFile(pathToProjectFolder);
-        Command.Execute("dotnet",$"pack {pathToProjectFile} --configuration Release --output {pathToPackageOutputFolder} "); 
+        Command.Execute("dotnet",$"pack {pathToProjectFile} --configuration Release --output {pathToPackageOutputFolder} {additionalArguments}"); 
     }
     
     public static void Build(string pathToProjectFolder)
