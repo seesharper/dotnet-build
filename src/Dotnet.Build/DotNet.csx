@@ -42,7 +42,7 @@ public static class DotNet
         Command.Execute("dotnet","build " + pathToProjectFile + " --configuration Release");  
     }
 
-    public static void Publish(string pathToProjectFolder, string outputFolder = null)
+    public static void Publish(string pathToProjectFolder, string outputFolder = null, string additionalArguments = "")
     {
          string pathToProjectFile = FindProjectFile(pathToProjectFolder);
          var args = $"publish {pathToProjectFile} --configuration Release";
@@ -50,6 +50,12 @@ public static class DotNet
          {
              args = args + $" --output {outputFolder}";
          }
+
+         if (!string.IsNullOrWhiteSpace(additionalArguments))
+         {
+             args = args + $" {additionalArguments}";
+         }   
+
          Command.Execute("dotnet", args);
     }
 
