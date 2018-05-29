@@ -41,4 +41,20 @@ public class FileUtilsTests
             }
         }
     }
+
+    public void ShouldNotCopyExcludedFolders()
+    {
+        using(var sourceFolder = new DisposableFolder())
+        {
+            Directory.CreateDirectory(Path.Combine(sourceFolder.Path, "ExcludedFolder"));
+            Directory.CreateDirectory(Path.Combine(sourceFolder.Path, "IncludedFolder"));
+            
+            using (var destinationFolder = new DisposableFolder())
+            {
+                Copy(sourceFolder.Path, destinationFolder.Path, new [] {"ExcludedFolder"});
+                Directory.Exists(Path.Combine(destinationFolder.Path,"ExcludedFolder")).Should().BeFalse();
+                Directory.Exists(Path.Combine(destinationFolder.Path,"IncludedFolder")).Should().BeTrue();                
+            }
+        }
+    }
 }
