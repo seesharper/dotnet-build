@@ -55,8 +55,12 @@ public static class FileUtils
         return PathType.File;
     }
 
-    public static void Copy(string sourcePath, string targetPath)
+    public static void Copy(string sourcePath, string targetPath, string[] excludeFolders = null)
     {
+        if (excludeFolders == null)
+        {
+            excludeFolders = Array.Empty<string>();
+        }
         var sourcePathType = GetPathType(sourcePath);
         if (sourcePathType == PathType.File)
         {
@@ -74,8 +78,12 @@ public static class FileUtils
             }
 
             foreach (var directory in Directory.GetDirectories(sourcePath))
-            {
-                Copy(directory, Path.Combine(targetPath, Path.GetFileName(directory)));
+            {                
+                var directoryName = Path.GetFileName(directory);
+                if (!excludeFolders.Contains(directoryName))
+                {
+                    Copy(directory, Path.Combine(targetPath, Path.GetFileName(directory)));
+                }                
             }
         }
     }

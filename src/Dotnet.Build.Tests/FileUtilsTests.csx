@@ -8,7 +8,7 @@ using FluentAssertions;
 using static FileUtils;
 using static ScriptUnit;
 
-//await AddTestsFrom<FileUtilsTests>().Execute();
+await AddTestsFrom<FileUtilsTests>().Execute();
 
 public class FileUtilsTests
 {
@@ -38,6 +38,22 @@ public class FileUtilsTests
                 var destinationPath = Path.Combine(destinationFolder.Path,destinationFileName);
                 Copy(sourcePath, destinationPath);
                 File.Exists(Path.Combine(destinationFolder.Path,destinationFileName)).Should().BeTrue();                                
+            }
+        }
+    }
+
+    public void ShouldNotCopyExcludedFolders()
+    {
+        using(var sourceFolder = new DisposableFolder())
+        {
+            Directory.CreateDirectory(Path.Combine(sourceFolder.Path, "ExcludedFolder"));
+            Directory.CreateDirectory(Path.Combine(sourceFolder.Path, "IncludedFolder"));
+            
+            using (var destinationFolder = new DisposableFolder())
+            {
+                Copy(sourceFolder.Path, destinationFolder.Path, new [] {"ExcludedFolder"});
+                Directory.Exists(Path.Combine(destinationFolder.Path,"ExcludedFolder")).Should().BeFalse();
+                Directory.Exists(Path.Combine(destinationFolder.Path,"IncludedFolder")).Should().BeTrue();                
             }
         }
     }
