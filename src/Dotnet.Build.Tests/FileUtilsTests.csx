@@ -57,4 +57,14 @@ public class FileUtilsTests
             }
         }
     }
+
+    public void ShouldFindFile()
+    {
+        using(var sourceFolder = new DisposableFolder())
+        {
+            File.WriteAllText(Path.Combine(sourceFolder.Path, "Test.txt"),"Test");
+            var result = FindFile(sourceFolder.Path, "Test.txt");
+            result.Should().Be(Path.Combine(sourceFolder.Path, "Test.txt"));
+        }
+    }
 }
