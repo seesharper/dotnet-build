@@ -11,7 +11,7 @@ using FluentAssertions;
 using static ScriptUnit;
 using static FileUtils;
 
-// await AddTestsFrom<DotNetTests>().AddFilter(m => m.IsDefined(typeof(OnlyThisAttribute), true)).Execute();
+//await AddTestsFrom<DotNetTests>().AddFilter(m => m.IsDefined(typeof(OnlyThisAttribute), true)).Execute();
 
 public class DotNetTests
 {
@@ -24,7 +24,15 @@ public class DotNetTests
             DotNet.Build(projectFolder.Path);
         }
     }
-  
+    [OnlyThis]
+    public void ShouldBuildProjectWithCommitHash()
+    {
+        using(var projectFolder = new DisposableFolder())
+        {
+            Command.Execute("dotnet",$"new console -o {projectFolder.Path}");
+            DotNet.Build(projectFolder.Path,"123");
+        }
+    }
    
     public void ShouldExecuteTests()
     {
@@ -55,7 +63,7 @@ public class DotNetTests
         }
     }
 
-    [OnlyThis]
+   
     public void ShouldPublishToGivenFolder()
     {
         using(var projectFolder = new DisposableFolder())

@@ -34,12 +34,16 @@ public static class DotNet
         Command.Execute("dotnet",$"pack {pathToProjectFile} --configuration Release --output {pathToPackageOutputFolder} {additionalArguments}"); 
     }
     
-    public static void Build(string pathToProjectFolder)
+    public static void Build(string pathToProjectFolder, string commitHash = "")
     {
+        if (!string.IsNullOrWhiteSpace(commitHash))
+        {
+            commitHash = $" /property:CommitHash={commitHash} ";
+        }
         string pathToProjectFile = FindProjectFile(pathToProjectFolder);
         Command.Execute("dotnet","--version");
-        Command.Execute("dotnet","restore " + pathToProjectFile);        
-        Command.Execute("dotnet","build " + pathToProjectFile + " --configuration Release");  
+        Command.Execute("dotnet",$"restore {pathToProjectFile}");        
+        Command.Execute("dotnet",$"build {pathToProjectFile} {commitHash} --configuration Release");        
     }
 
     public static void Publish(string pathToProjectFolder, string outputFolder = null, string targetFramework = null)
