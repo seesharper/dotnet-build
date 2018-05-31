@@ -1,6 +1,7 @@
+#load "Logger.csx"
 using System.IO.Compression;
 using System.Runtime.CompilerServices;
-
+using static Logger;
 
 
 public enum PathType
@@ -94,6 +95,28 @@ public static class FileUtils
         RemoveDirectory(pathToDirectory);
         Directory.CreateDirectory(pathToDirectory);
         return pathToDirectory;
+    }
+
+    public static string FindFile(string path, string filePattern)
+    {
+        Log($"Looking for {filePattern} in {path}");
+        string[] pathsToFile = Directory.GetFiles(path, filePattern, SearchOption.AllDirectories).ToArray();
+        if (pathsToFile.Length > 1)
+        {
+            Log("Found multiple files");
+            var files = pathsToFile.Select(p => new FileInfo(p));
+            var file = files.OrderBy(f => f.LastWriteTime).Last();
+            Log($"Choosing {file.FullName}");
+            return file.FullName;
+        }
+        else
+        if (pathsToFile.Length == 0)
+        {
+            Log($"File {filePattern} not found in {path}");
+            return null;
+        }
+        Log($"Found {pathsToFile[0]}");
+        return pathsToFile[0];
     }
 
     public static void RemoveDirectory(string path)
