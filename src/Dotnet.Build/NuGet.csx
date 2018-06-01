@@ -27,10 +27,17 @@ public static class NuGet
         }
     }
 
-    public static void Pack(string pathToMetadataFolder, string outputFolder)
+    public static void Pack(string pathToMetadataFolder, string outputFolder, string version = "")
     {
+        string versionArgument = "";
+        
+        if (!string.IsNullOrWhiteSpace(version))
+        {
+            versionArgument = $"-version {version}";
+        }
+
         var spec = Directory.GetFiles(pathToMetadataFolder,"*.nuspec").Single();
-        Command.Execute("nuget",$"pack {spec} -OutputDirectory {outputFolder}");
+        Command.Execute("nuget",$"pack {spec} {versionArgument} -OutputDirectory {outputFolder}");
     }
 
     public static void PackAsTool(string pathToProjectFolder, string pathToBinaries, string outputFolder)
