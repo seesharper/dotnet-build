@@ -18,6 +18,11 @@ public static class NuGet
         }
     }
 
+    public static void Install(string packageName, string outputDirectory)
+    {                
+        Command.Execute("nuget", $"install {packageName} -OutputDirectory {outputDirectory}", ".");
+    }
+
     public static void TryPush(string packagesFolder, string source = DefaultSource)
     {
         var packageFiles = Directory.GetFiles(packagesFolder, "*.nupkg");        
