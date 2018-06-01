@@ -8,6 +8,7 @@ using FluentAssertions;
 using static FileUtils;
 using static ScriptUnit;
 
+// await AddTestsFrom<FileUtilsTests>().AddFilter(m => m.IsDefined(typeof(OnlyThisAttribute), true)).Execute();
 //await AddTestsFrom<FileUtilsTests>().Execute();
 
 public class FileUtilsTests
@@ -25,6 +26,7 @@ public class FileUtilsTests
         }
     }
     
+   // [OnlyThis]
     public void ShouldCopyFile()
     {
         const string sourceFileName = "Source.txt";
@@ -38,6 +40,22 @@ public class FileUtilsTests
                 var destinationPath = Path.Combine(destinationFolder.Path,destinationFileName);
                 Copy(sourcePath, destinationPath);
                 File.Exists(Path.Combine(destinationFolder.Path,destinationFileName)).Should().BeTrue();                                
+            }
+        }
+    }
+
+    [OnlyThis]
+    public void ShouldCopyFileIntoTargetDirectory()
+    {
+        const string sourceFileName = "Source.txt";        
+        using(var sourceFolder = new DisposableFolder())
+        {
+            File.WriteAllText(Path.Combine(sourceFolder.Path, sourceFileName),"Test");
+            using (var destinationFolder = new DisposableFolder())
+            {
+                var sourcePath = Path.Combine(sourceFolder.Path,sourceFileName);             
+                Copy(sourcePath, destinationFolder.Path);
+                File.Exists(Path.Combine(destinationFolder.Path,sourceFileName)).Should().BeTrue();                                
             }
         }
     }

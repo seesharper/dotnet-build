@@ -46,6 +46,11 @@ public static class FileUtils
 
     public static PathType GetPathType(string path)
     {
+        if (!File.Exists(path) && !Directory.Exists(path))
+        {
+            return PathType.File;
+        }
+        
         FileAttributes attr = File.GetAttributes(path);
 
         if ((attr & FileAttributes.Directory) == FileAttributes.Directory)
@@ -63,11 +68,20 @@ public static class FileUtils
             excludeFolders = Array.Empty<string>();
         }
         var sourcePathType = GetPathType(sourcePath);
+        var targetPathType = GetPathType(targetPath);
         if (sourcePathType == PathType.File)
-        {
-            var targetFolder = Path.GetDirectoryName(targetPath);
-            Directory.CreateDirectory(targetFolder);
-            File.Copy(sourcePath, targetPath, true);
+        {            
+            if (targetPathType == PathType.Directory)
+            {
+                var targetFilePath = Path.Combine(targetPath, Path.GetFileName(sourcePath));
+                File.Copy(sourcePath, targetFilePath, true);
+            }
+            else
+            {
+                 var targetFolder = Path.GetDirectoryName(targetPath);
+                Directory.CreateDirectory(targetFolder);
+                File.Copy(sourcePath, targetPath, true);
+            }           
         }
         else
         {
