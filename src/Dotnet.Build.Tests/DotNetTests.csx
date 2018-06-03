@@ -2,6 +2,7 @@
 #r "nuget: FluentAssertions, 4.19.4"
 #load "../Dotnet.Build/Command.csx"
 #load "../Dotnet.Build/DotNet.csx"
+#load "../Dotnet.Build/xUnit.csx"
 
 #load "nuget:ScriptUnit, 0.1.3"
 #load "TestUtils.csx"
@@ -24,7 +25,7 @@ public class DotNetTests
             DotNet.Build(projectFolder.Path);
         }
     }
-    [OnlyThis]
+   
     public void ShouldBuildProjectWithCommitHash()
     {
         using(var projectFolder = new DisposableFolder())
@@ -43,6 +44,19 @@ public class DotNetTests
         }
     }
     
+    [OnlyThis]
+    public void ShouldAnalyzeCodeCoverageWithxUnit()
+    {
+        using(var projectFolder = new DisposableFolder())
+        {
+            Command.Execute("dotnet",$"new xunit -o {projectFolder.Path} -n TestProject");
+            ReplaceInFile("<TargetFramework.*", "<TargetFramework>net46</TargetFramework><DebugType>full</DebugType>",Path.Combine(projectFolder.Path,"TestProject.csproj"));
+            DotNet.Build(projectFolder.Path);
+            var testAssembly = FindFile(Path.Combine(projectFolder.Path,"bin"), "TestProject.dll");
+            xUnit.AnalyzeCodeCoverage(testAssembly);
+        }
+    }
+
     
     public void ShouldExecuteScriptTests()
     {

@@ -13,8 +13,8 @@ using static FileUtils;
 using FluentAssertions;
 
 
-//return await AddTestsFrom<NuGetTests>().Execute();
-
+return await AddTestsFrom<NuGetTests>().Execute();
+//return await AddTestsFrom<NuGetTests>().AddFilter(m => m.IsDefined(typeof(OnlyThisAttribute), true)).Execute();
 public class NuGetTests
 {    
     public void ShouldCreateToolPackage()
@@ -28,5 +28,14 @@ public class NuGetTests
         }
     }
   
+    [OnlyThis]
+    public void ShoudInstallPackage()
+    {
+        using(var targetFolder = new DisposableFolder())
+        {           
+            NuGet.Install("LightInject", targetFolder.Path);
+            FindFile(targetFolder.Path, "LightInject.dll").Should().NotBeEmpty();            
+        }
+    }
   	
 }

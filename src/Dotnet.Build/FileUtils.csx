@@ -1,6 +1,7 @@
 #load "Logger.csx"
 using System.IO.Compression;
 using System.Runtime.CompilerServices;
+using System.Text.RegularExpressions;
 using static Logger;
 
 
@@ -19,6 +20,13 @@ public static class FileUtils
     public static void Zip(string sourceDirectoryName, string pathToZipfile)
     {
         ZipFile.CreateFromDirectory(sourceDirectoryName, pathToZipfile);
+    }
+
+    public static void ReplaceInFile(string pattern, string value, string pathToFile)
+    {
+        var source = ReadFile(pathToFile);
+        var replacedSource = Regex.Replace(source, pattern, value);
+        WriteFile(pathToFile, replacedSource);
     }
 
     public static string ReadFile(string pathToFile)
