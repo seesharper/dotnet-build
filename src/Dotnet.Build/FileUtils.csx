@@ -105,7 +105,7 @@ public static class FileUtils
                 var directoryName = Path.GetFileName(directory);
                 if (!excludeFolders.Contains(directoryName))
                 {
-                    Copy(directory, Path.Combine(targetPath, Path.GetFileName(directory)));
+                    Copy(directory, Path.Combine(targetPath, Path.GetFileName(directory)), excludeFolders);
                 }                
             }
         }
