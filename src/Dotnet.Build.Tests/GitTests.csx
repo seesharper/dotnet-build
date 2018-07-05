@@ -11,7 +11,7 @@ using FluentAssertions;
 using static ScriptUnit; 
 using static FileUtils;
 //await AddTestsFrom<GitTests>().Execute();
-await AddTestsFrom<GitTests>().AddFilter(m => m.IsDefined(typeof(OnlyThisAttribute), true)).Execute();
+//await AddTestsFrom<GitTests>().AddFilter(m => m.IsDefined(typeof(OnlyThisAttribute), true)).Execute();
 
 private static GitRepository Init(this DisposableFolder disposableFolder)
 {

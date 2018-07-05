@@ -28,22 +28,22 @@ public static class DotNet
         throw new InvalidOperationException($"No tests found at the path {path}");
     }
     
-    public static void Pack(string pathToProjectFolder, string pathToPackageOutputFolder, string additionalArguments = "")
-    {
-        string pathToProjectFile = FindProjectFile(pathToProjectFolder);
-        Command.Execute("dotnet",$"pack {pathToProjectFile} --configuration Release --output {pathToPackageOutputFolder} {additionalArguments}"); 
-    }
-    
-    public static void Build(string pathToProjectFolder, string commitHash = "")
-    {
+    public static void Pack(string pathToProjectFolder, string pathToPackageOutputFolder, string commitHash = "")
+    {        
         if (!string.IsNullOrWhiteSpace(commitHash))
         {
             commitHash = $" /property:CommitHash={commitHash} ";
         }
         string pathToProjectFile = FindProjectFile(pathToProjectFolder);
+        Command.Execute("dotnet",$"pack {pathToProjectFile} --configuration Release --output {pathToPackageOutputFolder} {commitHash}"); 
+    }
+    
+    public static void Build(string pathToProjectFolder)
+    {        
+        string pathToProjectFile = FindProjectFile(pathToProjectFolder);
         Command.Execute("dotnet","--version");
         Command.Execute("dotnet",$"restore {pathToProjectFile}");        
-        Command.Execute("dotnet",$"build {pathToProjectFile} {commitHash} --configuration Release");        
+        Command.Execute("dotnet",$"build {pathToProjectFile} --configuration Release");        
     }
 
     public static void Publish(string pathToProjectFolder, string outputFolder = null, string targetFramework = null)
