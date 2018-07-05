@@ -11,7 +11,7 @@ using FluentAssertions;
 using static ScriptUnit; 
 using static FileUtils;
 //await AddTestsFrom<GitTests>().Execute();
-// await AddTestsFrom<GitTests>().AddFilter(m => m.IsDefined(typeof(OnlyThisAttribute), true)).Execute();
+//await AddTestsFrom<GitTests>().AddFilter(m => m.IsDefined(typeof(OnlyThisAttribute), true)).Execute();
 
 private static GitRepository Init(this DisposableFolder disposableFolder)
 {
@@ -30,6 +30,18 @@ public class GitTests
             var repo = folder.Init();
             repo.Execute("commit --allow-empty -m \"First Commit\"");
             var latestCommitHash = repo.GetCurrentCommitHash();            
+            latestCommitHash.Should().NotBeEmpty();                      
+        }
+    }
+    
+    [OnlyThis]
+    public void ShouldGetCurrentShortCommitHash()
+    {
+         using (var folder = new DisposableFolder())
+        {                    
+            var repo = folder.Init();
+            repo.Execute("commit --allow-empty -m \"First Commit\"");
+            var latestCommitHash = repo.GetCurrentShortCommitHash();            
             latestCommitHash.Should().NotBeEmpty();                      
         }
     }
@@ -84,7 +96,7 @@ public class GitTests
             repo.HasStagedFiles().Should().BeFalse();
         }
     }
-    [OnlyThis]
+    
     public void ShouldDetectUnstagedFiles()
     {
         using (var folder = new DisposableFolder())
