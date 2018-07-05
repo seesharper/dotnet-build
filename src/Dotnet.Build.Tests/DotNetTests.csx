@@ -26,12 +26,13 @@ public class DotNetTests
         }
     }
    
-    public void ShouldBuildProjectWithCommitHash()
+    [OnlyThis]
+    public void ShouldPackProjectWithCommitHash()
     {
         using(var projectFolder = new DisposableFolder())
         {
             Command.Execute("dotnet",$"new console -o {projectFolder.Path}");
-            DotNet.Build(projectFolder.Path,"123");
+            DotNet.Pack(projectFolder.Path,"123");
         }
     }
    
@@ -44,7 +45,7 @@ public class DotNetTests
         }
     }
     
-    [OnlyThis]
+   
     public void ShouldAnalyzeCodeCoverageWithxUnit()
     {
         using(var projectFolder = new DisposableFolder())
