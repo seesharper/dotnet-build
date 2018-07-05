@@ -45,6 +45,11 @@ public class GitRepository
         return Execute("rev-list --all --max-count=1").StandardOut.RemoveNewLine();        
     }  
 
+    public string GetCurrentShortCommitHash()
+    {        
+        return Execute("rev-parse --short HEAD").StandardOut.RemoveNewLine();        
+    } 
+
     public string GetLatestTag()
     {                        
         return Execute($"describe --abbrev=0 --tags { GetCurrentCommitHash() }").StandardOut.RemoveNewLine();
