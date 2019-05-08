@@ -1,5 +1,4 @@
-#! "netcoreapp2.0"
-#r "nuget: FluentAssertions, 4.19.4"
+#r "nuget: FluentAssertions, 5.6.0"
 #r "nuget:Octokit, 0.27.0"
 #load "../Dotnet.Build/FileUtils.csx"
 #load "../Dotnet.Build/GitHub-ReleaseManager.csx"
@@ -20,7 +19,7 @@ public class ReleaseManagerTests
     private static string Owner = "seesharper";
     private static string Repository = "release-fixture";
 
-    
+
     public async Task ShouldCreateRelease()
     {
         var accessToken = System.Environment.GetEnvironmentVariable("GITHUB_REPO_TOKEN");
@@ -39,7 +38,7 @@ public class ReleaseManagerTests
         latestRelease.Body.Should().Be("This is some release notes");
     }
 
-   
+
     public async Task ShouldUpdateRelease()
     {
         var accessToken = System.Environment.GetEnvironmentVariable("GITHUB_REPO_TOKEN");
@@ -57,11 +56,11 @@ public class ReleaseManagerTests
             File.WriteAllText(pathToReleaseNotes, "This is some release notes");
             await ReleaseManagerFor(Owner, Repository, accessToken).CreateRelease("0.1.0", pathToReleaseNotes, new[] { new ZipReleaseAsset(pathToReleaseNotes) });
         }
-        
+
         var latestRelease = await client.Repository.Release.GetLatest(Owner, Repository);
         latestRelease.Name.Should().Be("0.1.0");
         latestRelease.Body.Should().Be("This is some release notes");
-        
+
     }
 
 

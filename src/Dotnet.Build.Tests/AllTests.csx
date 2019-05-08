@@ -1,4 +1,3 @@
-#! "netcoreapp2.0"
 #load "../Dotnet.Build.Tests/CommandTests.csx"
 #load "../Dotnet.Build.Tests/GitTests.csx"
 #load "../Dotnet.Build.Tests/DotNetTests.csx"
@@ -10,7 +9,7 @@
 
 #load "nuget:ScriptUnit, 0.1.3"
 
-using static ScriptUnit; 
+using static ScriptUnit;
 
 var testRunner = AddTestsFrom<CommandTests>()
     .AddTestsFrom<DotNetTests>()
@@ -21,6 +20,6 @@ var testRunner = AddTestsFrom<CommandTests>()
 if (BuildEnvironment.IsSecure)
 {
     testRunner = testRunner.AddTestsFrom<ReleaseManagerTests>();
-}        
+}
 
 return await testRunner.Execute();

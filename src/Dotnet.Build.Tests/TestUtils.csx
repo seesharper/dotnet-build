@@ -6,7 +6,7 @@ public static string[] ReadLines(this string value)
 {
     Collection<string> result = new Collection<string>();
     var reader = new StringReader(value);
-    while(reader.Peek() != -1)
+    while (reader.Peek() != -1)
     {
         result.Add(reader.ReadLine());
     }
@@ -15,5 +15,5 @@ public static string[] ReadLines(this string value)
 
 public class OnlyThisAttribute : Attribute
 {
-    
+
 }

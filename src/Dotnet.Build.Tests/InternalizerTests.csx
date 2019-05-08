@@ -1,5 +1,4 @@
-#! "netcoreapp2.0"
-#r "nuget: FluentAssertions, 4.19.4"
+#r "nuget: FluentAssertions, 5.6.0"
 #load "../Dotnet.Build/FileUtils.csx"
 #load "../Dotnet.Build/Internalizer.csx"
 #load "nuget:ScriptUnit, 0.1.3"
@@ -22,9 +21,9 @@ public class InternalizerTests
 
         }";
 
-        Internalize(source).Should().Contain("internal interface Foo");        
+        Internalize(source).Should().Contain("internal interface Foo");
     }
-    
+
     public void ShouldInternalizeClass()
     {
         string source =
@@ -34,7 +33,7 @@ public class InternalizerTests
 
         }";
 
-        Internalize(source).Should().Contain("internal class Foo");        
+        Internalize(source).Should().Contain("internal class Foo");
     }
 
     public void ShouldInternalizeStruct()
@@ -46,8 +45,8 @@ public class InternalizerTests
 
         }";
 
-        Internalize(source).Should().Contain("internal struct Foo");      
-        
+        Internalize(source).Should().Contain("internal struct Foo");
+
     }
 
     public void ShouldInternalizeEnum()
@@ -59,20 +58,20 @@ public class InternalizerTests
 
         }";
 
-        Internalize(source).Should().Contain("internal enum Foo");      
-        
+        Internalize(source).Should().Contain("internal enum Foo");
+
     }
 
     [OnlyThis]
     public void ShouldAddExcludeFromCodeCoverageAttribute()
     {
         string source =
-        @"        
+        @"
         public class Foo
         {
 
         }";
-        
+
         Internalize(source).ReadLines()[1].Should().Contain("[ExcludeFromCodeCoverage]");
     }
 
@@ -83,7 +82,7 @@ public class InternalizerTests
             string fileName = Path.Combine(disposableFolder.Path, "source.cs");
             WriteFile(fileName, source);
             Internalizer.Internalize(disposableFolder.Path);
-            return ReadFile(fileName);            
+            return ReadFile(fileName);
         }
     }
 }
