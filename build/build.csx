@@ -1,4 +1,3 @@
-#! "netcoreapp2.0"
 #r "nuget:Octokit, 0.27.0"
 #load "nuget:github-changelog, 0.1.4"
 #load "../src/Dotnet.Build/Command.csx"
@@ -38,7 +37,7 @@ if (BuildEnvironment.IsSecure)
 {
     Logger.Log("Creating release notes");
     string pathToReleaseNotes = Path.Combine(pathToGitHubArtifacts, "ReleaseNotes.md");
-    
+
     var generator = ChangeLogFrom("seesharper", "dotnet-build", BuildEnvironment.GitHubAccessToken).SinceLatestTag();
     if (!Git.Default.IsTagCommit())
     {
@@ -49,7 +48,7 @@ if (BuildEnvironment.IsSecure)
 
     if (Git.Default.IsTagCommit())
     {
-        Git.Default.RequreCleanWorkingTree();
+        Git.Default.RequireCleanWorkingTree();
         await ReleaseManagerFor("seesharper", "dotnet-build", accessToken)
             .CreateRelease(Git.Default.GetLatestTag(), pathToReleaseNotes, Array.Empty<ReleaseAsset>());
         NuGet.Push(pathToNuGetArtifacts);
