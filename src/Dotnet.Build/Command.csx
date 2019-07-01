@@ -4,22 +4,24 @@ using System.Threading;
 using System.Text.RegularExpressions;
 
 public static class Command
-{                     
+{
     public static CommandResult Capture(string commandPath, string arguments, string workingDirectory = null)
     {
-        var startInformation =  CreateProcessStartInfo(commandPath, arguments, workingDirectory);
+        var startInformation = CreateProcessStartInfo(commandPath, arguments, workingDirectory);
         var process = CreateProcess(startInformation);
-        process.Start();                        
-        process.WaitForExit();   
-        return new CommandResult(process.ExitCode, process.StandardOutput.ReadToEnd(), process.StandardError.ReadToEnd());
+        process.Start();
+        var standardOut = process.StandardOutput.ReadToEnd();
+        var standardError = process.StandardError.ReadToEnd();
+        process.WaitForExit();
+        return new CommandResult(process.ExitCode, standardOut, standardError);
     }
 
-    public static int Execute(string commandPath, string arguments, string workingDirectory = null,int success = 0)
+    public static int Execute(string commandPath, string arguments, string workingDirectory = null, int success = 0)
     {
-        var startInformation =  CreateProcessStartInfo(commandPath, arguments, workingDirectory);
+        var startInformation = CreateProcessStartInfo(commandPath, arguments, workingDirectory);
         var process = CreateProcess(startInformation);
-        process.OutputDataReceived += (o,a) => WriteStandardOut(a);
-        process.ErrorDataReceived += (o,a) => WriteStandardError(a);        
+        process.OutputDataReceived += (o, a) => WriteStandardOut(a);
+        process.ErrorDataReceived += (o, a) => WriteStandardError(a);
         void WriteStandardOut(DataReceivedEventArgs args)
         {
             if (args.Data != null)
@@ -38,8 +40,8 @@ public static class Command
 
         process.Start();
         process.BeginOutputReadLine();
-        process.BeginErrorReadLine();                        
-        process.WaitForExit();   
+        process.BeginErrorReadLine();
+        process.WaitForExit();
 
         if (process.ExitCode != success)
         {
@@ -52,23 +54,23 @@ public static class Command
     {
         var startInformation = new ProcessStartInfo($"{commandPath}");
         startInformation.CreateNoWindow = true;
-        startInformation.Arguments =  arguments;
+        startInformation.Arguments = arguments;
         startInformation.RedirectStandardOutput = true;
         startInformation.RedirectStandardError = true;
-        startInformation.UseShellExecute = false;  
-        startInformation.WorkingDirectory = workingDirectory ?? Environment.CurrentDirectory;             
+        startInformation.UseShellExecute = false;
+        startInformation.WorkingDirectory = workingDirectory ?? Environment.CurrentDirectory;
         return startInformation;
     }
 
     private static void RunAndWait(Process process)
-    {        
-        process.Start();                        
-        process.WaitForExit();                
+    {
+        process.Start();
+        process.WaitForExit();
     }
     private static Process CreateProcess(ProcessStartInfo startInformation)
     {
         var process = new Process();
-        process.StartInfo = startInformation;                  
+        process.StartInfo = startInformation;
         return process;
     }
 }
