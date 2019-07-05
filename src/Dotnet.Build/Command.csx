@@ -7,19 +7,39 @@ public static class Command
 {
     public static CommandResult Capture(string commandPath, string arguments, string workingDirectory = null)
     {
-        var startInformation = CreateProcessStartInfo(commandPath, arguments, workingDirectory);
-        var process = CreateProcess(startInformation);
-        process.Start();
-        var standardOut = process.StandardOutput.ReadToEnd();
-        var standardError = process.StandardError.ReadToEnd();
-        process.WaitForExit();
-        return new CommandResult(process.ExitCode, standardOut, standardError);
+        return CaptureAsync(commandPath, arguments, workingDirectory).Result;
     }
 
-    public static int Execute(string commandPath, string arguments, string workingDirectory = null, int success = 0)
+    public static async Task<CommandResult> CaptureAsync(string commandPath, string arguments, string workingDirectory = null)
     {
-        var startInformation = CreateProcessStartInfo(commandPath, arguments, workingDirectory);
-        var process = CreateProcess(startInformation);
+        var process = CreateProcess(commandPath, arguments, workingDirectory);
+
+        var startProcessTask = StartProcessAsync(process, echo: false);
+        var readStandardOutputTask = process.StandardOutput.ReadToEndAsync();
+        var readStandardErrorTask = process.StandardError.ReadToEndAsync();
+
+        await Task.WhenAll(startProcessTask, readStandardOutputTask, readStandardErrorTask).ConfigureAwait(false);
+        return new CommandResult(startProcessTask.Result, readStandardOutputTask.Result, readStandardErrorTask.Result);
+    }
+
+    public static async Task ExecuteAsync(string commandPath, string arguments, string workingDirectory = null, int success = 0)
+    {
+        var process = CreateProcess(commandPath, arguments, workingDirectory);
+        RedirectToConsole(process);
+        var exitCode = await StartProcessAsync(process, echo: true);
+        if (exitCode != success)
+        {
+            throw new InvalidOperationException($"The command {commandPath} {arguments} failed.");
+        }
+    }
+
+    public static void Execute(string commandPath, string arguments, string workingDirectory = null, int success = 0)
+    {
+        ExecuteAsync(commandPath, arguments, workingDirectory, success).Wait();
+    }
+
+    private static void RedirectToConsole(Process process)
+    {
         process.OutputDataReceived += (o, a) => WriteStandardOut(a);
         process.ErrorDataReceived += (o, a) => WriteStandardError(a);
         void WriteStandardOut(DataReceivedEventArgs args)
@@ -34,23 +54,12 @@ public static class Command
         {
             if (args.Data != null)
             {
-                Out.WriteLine(args.Data);
+                Error.WriteLine(args.Data);
             }
         }
-
-        process.Start();
-        process.BeginOutputReadLine();
-        process.BeginErrorReadLine();
-        process.WaitForExit();
-
-        if (process.ExitCode != success)
-        {
-            throw new InvalidOperationException($"The command {commandPath} {arguments} failed.");
-        }
-
-        return process.ExitCode;
     }
-    private static ProcessStartInfo CreateProcessStartInfo(string commandPath, string arguments, string workingDirectory)
+
+    private static Process CreateProcess(string commandPath, string arguments, string workingDirectory)
     {
         var startInformation = new ProcessStartInfo($"{commandPath}");
         startInformation.CreateNoWindow = true;
@@ -59,19 +68,23 @@ public static class Command
         startInformation.RedirectStandardError = true;
         startInformation.UseShellExecute = false;
         startInformation.WorkingDirectory = workingDirectory ?? Environment.CurrentDirectory;
-        return startInformation;
-    }
-
-    private static void RunAndWait(Process process)
-    {
-        process.Start();
-        process.WaitForExit();
-    }
-    private static Process CreateProcess(ProcessStartInfo startInformation)
-    {
         var process = new Process();
         process.StartInfo = startInformation;
         return process;
+    }
+
+    private static Task<int> StartProcessAsync(Process process, bool echo)
+    {
+        var tcs = new TaskCompletionSource<int>();
+        process.Exited += (o, s) => tcs.SetResult(process.ExitCode);
+        process.EnableRaisingEvents = true;
+        process.Start();
+        if (echo)
+        {
+            process.BeginOutputReadLine();
+            process.BeginErrorReadLine();
+        }
+        return tcs.Task;
     }
 }
 
