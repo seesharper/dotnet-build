@@ -16,8 +16,8 @@ public static class Internalizer
     {
         Logger.Log($"Internalizing {pathToSourceFile}");
         var source = FileUtils.ReadFile(pathToSourceFile);
-               
-        string negativeLookahead = string.Empty;                        
+
+        string negativeLookahead = string.Empty;
         if (exceptTheseTypes != null)
         {
             foreach (var type in exceptTheseTypes)
@@ -25,13 +25,13 @@ public static class Internalizer
                 negativeLookahead += string.Format("(?!{0})", type);
             }
         }
-        
+
         // Make all public classes internal
-        source = Regex.Replace(source, "public (.*class |struct |interface |enum )" + negativeLookahead, "internal $1");
-                        
+        source = Regex.Replace(source, "public (.*class |struct |interface |enum |delegate)" + negativeLookahead, "internal $1");
+
         // Exclude classes from code coverage
         source = Regex.Replace(source, @"(([^\S\r\n]*)internal.*class.*)", "$2[ExcludeFromCodeCoverage]\r\n$1");
-                                
+
         FileUtils.WriteFile(pathToSourceFile, source);
     }
 }
