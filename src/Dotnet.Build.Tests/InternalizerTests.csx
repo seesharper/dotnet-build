@@ -62,6 +62,13 @@ public class InternalizerTests
 
     }
 
+    public void ShouldInternalizeDelegate()
+    {
+        string source = "public delegate object SomeDelegate()";
+
+        Internalize(source).Should().Contain("internal delegate object SomeDelegate()");
+    }
+
     [OnlyThis]
     public void ShouldAddExcludeFromCodeCoverageAttribute()
     {
