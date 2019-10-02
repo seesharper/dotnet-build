@@ -1,5 +1,6 @@
 #load "Command.csx"
 #load "FileUtils.csx"
+#load "CodeCoverageReportGenerator.csx"
 
 using static FileUtils;
 
@@ -42,7 +43,7 @@ public static class DotNet
 
         Command.Execute("dotnet", $"test -c release {targetFramework}  /property:CollectCoverage=true /property:Include=\"[{projectName}*]*\" /property:Exclude=\"[*Tests*]*\" /property:CoverletOutputFormat=\\\"opencover,lcov,json\\\" /property:CoverletOutput={codeCoverageArtifactsFolder}/coverage /property:Threshold={threshold}", pathToTestProjectFolder);
         var pathToOpenCoverResult = Path.Combine(codeCoverageArtifactsFolder, "coverage.opencover.xml");
-        Command.Execute("dotnet", $"reportgenerator \"-reports:{pathToOpenCoverResult}\"  \"-targetdir:{codeCoverageArtifactsFolder}/Report\" \"-reportTypes:XmlSummary;Xml;HtmlInline_AzurePipelines_Dark\" \"--verbosity:warning\"", pathToTestProjectFolder);
+        CodeCoverageReportGenerator.Generate(pathToOpenCoverResult, $"{codeCoverageArtifactsFolder}/Report");
     }
 
 
