@@ -1,5 +1,5 @@
 #r "nuget:Octokit, 0.27.0"
-#load "nuget:github-changelog, 0.1.4"
+#load "nuget:github-changelog, 0.1.5"
 #load "../src/Dotnet.Build/Command.csx"
 #load "../src/Dotnet.Build/DotNet.csx"
 #load "../src/Dotnet.Build/FileUtils.csx"
