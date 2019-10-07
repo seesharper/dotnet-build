@@ -1,6 +1,9 @@
 #load "Command.csx"
 #load "FileUtils.csx"
+#load "CodeCoverageReportGenerator.csx"
+#load "BuildContext.csx"
 
+using System.Xml.Linq;
 using static FileUtils;
 
 public static class DotNet
@@ -29,6 +32,18 @@ public static class DotNet
     }
 
     /// <summary>
+    /// Executes all test projects found in <see cref="BuildContext.TestProjects"/>.
+    /// </summary>
+    public static void Test()
+    {
+        var testprojects = BuildContext.TestProjects;
+        foreach (var testProject in testprojects)
+        {
+            Command.Execute("dotnet", "test " + testProject + " --configuration Release");
+        }
+    }
+
+    /// <summary>
     /// Executes the tests with code coverage.
     /// </summary>
     /// <param name="pathToProjectFolder"></param>
@@ -39,10 +54,43 @@ public static class DotNet
         {
             targetFramework = $" -f {targetFramework} ";
         }
-
-        Command.Execute("dotnet", $"test -c release {targetFramework}  /property:CollectCoverage=true /property:Include=\"[{projectName}*]*\" /property:Exclude=\"[*Tests*]*\" /property:CoverletOutputFormat=\\\"opencover,lcov,json\\\" /property:CoverletOutput={codeCoverageArtifactsFolder}/coverage /property:Threshold={threshold}", pathToTestProjectFolder);
+        //dotnet test -c release -f netcoreapp2.0 /p:CollectCoverage=true /p:Exclude="[xunit*]*%2c[*Tests*]*"
+        Command.Execute("dotnet", $"test -c release {targetFramework}  /property:CollectCoverage=true /property:Exclude=\"[xunit*]*%2c[*Tests*]*\" /property:CoverletOutputFormat=\\\"opencover,lcov,json\\\" /property:CoverletOutput={codeCoverageArtifactsFolder}/coverage /property:Threshold={threshold}", pathToTestProjectFolder);
         var pathToOpenCoverResult = Path.Combine(codeCoverageArtifactsFolder, "coverage.opencover.xml");
-        Command.Execute("dotnet", $"reportgenerator \"-reports:{pathToOpenCoverResult}\"  \"-targetdir:{codeCoverageArtifactsFolder}/Report\" \"-reportTypes:XmlSummary;Xml;HtmlInline_AzurePipelines_Dark\" \"--verbosity:warning\"", pathToTestProjectFolder);
+        CodeCoverageReportGenerator.Generate(pathToOpenCoverResult, $"{codeCoverageArtifactsFolder}/Report");
+    }
+
+    /// <summary>
+    /// Executes all test projects found in <see cref="BuildContext.TestProjects"/> with test coverage.
+    /// </summary>
+    public static void TestWithCodeCoverage()
+    {
+        var testprojects = BuildContext.TestProjects;
+        foreach (var testProject in testprojects)
+        {
+            var targetFramework = GetTargetFrameWork(testProject);
+            TestWithCodeCoverage(BuildContext.ProjectName, Path.GetDirectoryName(testProject), BuildContext.TestCoverageArtifactsFolder, BuildContext.CodeCoverageThreshold, targetFramework);
+        }
+
+        string GetTargetFrameWork(string pathToProjectFile)
+        {
+            var projectFile = XDocument.Load(pathToProjectFile);
+            var targetFrameworks = projectFile.Descendants("TargetFrameworks").SingleOrDefault()?.Value;
+            if (targetFrameworks != null)
+            {
+                return targetFrameworks.Split(";").First();
+            }
+
+            return null;
+        }
+    }
+
+    public static void Pack()
+    {
+        foreach (var packableProject in BuildContext.PackableProjects)
+        {
+            Pack(Path.GetDirectoryName(packableProject), BuildContext.NuGetArtifactsFolder, BuildContext.CurrentShortCommitHash);
+        }
     }
 
 

@@ -77,7 +77,12 @@ public class GitRepository
 
     public string GetPreviousTag()
     {
-        return Execute($"describe --abbrev=0 --tags { GetPreviousCommitHash() }").StandardOut.RemoveNewLine(); ;
+        return Execute($"describe --abbrev=0 --tags { GetPreviousCommitHash() }").StandardOut.RemoveNewLine();
+    }
+
+    public string GetRootFolder()
+    {
+        return Execute("rev-parse --show-toplevel").StandardOut.RemoveNewLine(); ;
     }
 
     public RepositoryInfo GetRepositoryInfo()
@@ -86,7 +91,8 @@ public class GitRepository
         var match = Regex.Match(urlToPushOrigin, @".*.com\/(.*)\/(.*)\.");
         var owner = match.Groups[1].Value;
         var project = match.Groups[2].Value;
-        return new RepositoryInfo() { Owner = owner, ProjectName = project };
+        var rootFolder = GetRootFolder();
+        return new RepositoryInfo(owner, project, rootFolder);
     }
 
     public bool AllTagsPushedToOrigin()
@@ -172,7 +178,16 @@ public static class Git
 
 public class RepositoryInfo
 {
-    public string Owner { get; set; }
+    public RepositoryInfo(string owner, string projectName, string rootFolder)
+    {
+        Owner = owner;
+        ProjectName = projectName;
+        RootFolder = rootFolder;
+    }
 
-    public string ProjectName { get; set; }
+    public string Owner { get; }
+
+    public string ProjectName { get; }
+
+    public string RootFolder { get; }
 }

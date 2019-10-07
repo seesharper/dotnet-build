@@ -37,6 +37,10 @@ public static class NuGet
         }
     }
 
+    public static void TryPush()
+    {
+        TryPush(BuildContext.NuGetArtifactsFolder);
+    }
     public static void Pack(string pathToMetadataFolder, string outputFolder, string version = "")
     {
         string versionArgument = "";
