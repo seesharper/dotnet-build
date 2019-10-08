@@ -88,7 +88,11 @@ public class GitRepository
     public RepositoryInfo GetRepositoryInfo()
     {
         var urlToPushOrigin = GetUrlToPushOrigin();
-        var match = Regex.Match(urlToPushOrigin, @".*.com\/(.*)\/(.*)\.");
+        if (!urlToPushOrigin.EndsWith(".git"))
+        {
+            urlToPushOrigin = $"{urlToPushOrigin}.git";
+        }
+        var match = Regex.Match(urlToPushOrigin, @".*.com\/(.*)\/(.*)\.git");
         var owner = match.Groups[1].Value;
         var project = match.Groups[2].Value;
         var rootFolder = GetRootFolder();
