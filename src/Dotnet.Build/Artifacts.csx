@@ -2,7 +2,7 @@
 #load "BuildContext.csx"
 #load "GitHub.csx"
 #load "Git.csx"
-#load "NuGet.csx"
+#load "DotNet.csx"
 public static class Artifacts
 {
     public async static Task Deploy()
@@ -25,7 +25,7 @@ public static class Artifacts
 
         await GitHub.Release();
 
-        NuGet.TryPush();
+        DotNet.TryPush();
 
     }
 }

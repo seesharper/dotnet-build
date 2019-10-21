@@ -51,7 +51,7 @@ if (BuildEnvironment.IsSecure)
         Git.Default.RequireCleanWorkingTree();
         await ReleaseManagerFor("seesharper", "dotnet-build", accessToken)
             .CreateRelease(Git.Default.GetLatestTag(), pathToReleaseNotes, Array.Empty<ReleaseAsset>());
-        NuGet.Push(pathToNuGetArtifacts);
+        DotNet.Push(pathToNuGetArtifacts);
     }
 }
 
