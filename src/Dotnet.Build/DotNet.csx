@@ -8,6 +8,10 @@ using static FileUtils;
 
 public static class DotNet
 {
+    private const string DefaultSource = "https://www.nuget.org/api/v2/package";
+
+    private static string NuGetApiKey = System.Environment.GetEnvironmentVariable("NUGET_APIKEY");
+
     /// <summary>
     /// Executes the tests in the given path. The path may the full path to a csproj file
     /// that represents a test project or it may be the
@@ -103,6 +107,36 @@ public static class DotNet
         string pathToProjectFile = FindProjectFile(pathToProjectFolder);
         Command.Execute("dotnet", $"pack {pathToProjectFile} --configuration Release --output {pathToPackageOutputFolder} {commitHash}");
     }
+
+    public static void Push(string packagesFolder, string source = DefaultSource)
+    {
+        var packageFiles = Directory.GetFiles(packagesFolder, "*.nupkg");
+        foreach (var packageFile in packageFiles)
+        {
+            Command.Execute("dotnet", $"nuget push {packageFile} --source {source} --api-key {NuGetApiKey}");
+        }
+    }
+
+    public static void Push()
+    {
+        Push(BuildContext.NuGetArtifactsFolder);
+    }
+
+
+    public static void TryPush(string packagesFolder, string source = DefaultSource)
+    {
+        var packageFiles = Directory.GetFiles(packagesFolder, "*.nupkg");
+        foreach (var packageFile in packageFiles)
+        {
+            Command.Capture("dotnet", $"nuget push {packageFile} --source {source} --api-key {NuGetApiKey}").Dump();
+        }
+    }
+
+    public static void TryPush()
+    {
+        TryPush(BuildContext.NuGetArtifactsFolder);
+    }
+
 
     public static void Build(string pathToProjectFolder)
     {
