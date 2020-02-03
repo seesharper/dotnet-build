@@ -1,4 +1,4 @@
-#r "nuget:ReportGenerator.Core, 4.3.0"
+#r "nuget:ReportGenerator.Core, 4.4.6"
 using Palmmedia.ReportGenerator.Core;
 
 public static class CodeCoverageReportGenerator
