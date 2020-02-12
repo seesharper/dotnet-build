@@ -42,7 +42,7 @@ public class GitRepository
 
     public string GetCurrentCommitHash()
     {
-        return Execute("rev-list --all --max-count=1").StandardOut.RemoveNewLine();
+        return Execute("rev-list HEAD --max-count=1").StandardOut.RemoveNewLine();
     }
 
     public string GetCurrentShortCommitHash()
