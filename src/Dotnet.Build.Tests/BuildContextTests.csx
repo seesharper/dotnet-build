@@ -10,7 +10,7 @@ using static FileUtils;
 
 #pragma warning disable 1702
 
-await AddTestsFrom<BuildContextTests>().AddFilter(m => m.IsDefined(typeof(OnlyThisAttribute), true)).Execute();
+//await AddTestsFrom<BuildContextTests>().AddFilter(m => m.IsDefined(typeof(OnlyThisAttribute), true)).Execute();
 public class BuildContextTests
 {
     public void ShouldGetOwnerAndProjectName()
