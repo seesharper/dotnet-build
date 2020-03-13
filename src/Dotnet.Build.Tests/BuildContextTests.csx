@@ -13,7 +13,6 @@ using static FileUtils;
 //await AddTestsFrom<BuildContextTests>().AddFilter(m => m.IsDefined(typeof(OnlyThisAttribute), true)).Execute();
 public class BuildContextTests
 {
-    [OnlyThis]
     public void ShouldGetOwnerAndProjectName()
     {
         using (var repositoryFolder = new DisposableFolder())
@@ -30,7 +29,16 @@ public class BuildContextTests
             Directory.Exists(BuildContext.GitHubArtifactsFolder);
             Directory.Exists(BuildContext.TestCoverageArtifactsFolder);
         }
+    }
 
-
+    [OnlyThis]
+    public void ShouldIncludePackableConsoleAppAsPackable()
+    {
+        using (var repositoryFolder = new DisposableFolder())
+        {
+            Command.Execute("git", "clone https://github.com/seesharper/dotnet-deps.git", repositoryFolder.Path);
+            BuildContext.RepositoryFolder = Path.Combine(repositoryFolder.Path, "dotnet-deps");
+            BuildContext.PackableProjects.Count().Should().Be(2);
+        }
     }
 }

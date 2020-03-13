@@ -41,7 +41,7 @@ public static class BuildContext
     public static string TestCoverageArtifactsFolder => testCoverageArtifactsFolder.Value;
     public static string[] TestProjects => FindProjectFiles().Where(IsTestProject).ToArray();
 
-    public static string[] PackableProjects => SourceProjects.Where(p => IsPackable(p) && IsLibrary(p)).ToArray();
+    public static string[] PackableProjects => SourceProjects.Where(p => IsPackable(p)).ToArray();
 
     public static string[] SourceProjects => FindProjectFiles().Where(p => !IsTestProject(p)).ToArray();
 
