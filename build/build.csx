@@ -31,7 +31,7 @@ var accessToken = System.Environment.GetEnvironmentVariable("GITHUB_REPO_TOKEN")
 DotNet.Test(Path.Combine(scriptFolder, "..", "src", "DotNet.Build.Tests", "AllTests.csx"));
 
 string pathToNuGetArtifacts = CreateDirectory(Path.Combine(scriptFolder, "Artifacts", "NuGet"));
-NuGet.Pack(tempFolder, pathToNuGetArtifacts);
+NuGetHelper.Pack(tempFolder, pathToNuGetArtifacts);
 
 if (BuildEnvironment.IsSecure)
 {

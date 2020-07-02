@@ -1,14 +1,16 @@
+#r "nuget:NuGet.Packaging, 4.6.4"
 #load "Command.csx"
 #load "FileUtils.csx"
 #load "Internalizer.csx"
 #load "DotNet.csx"
+
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
 using static FileUtils;
 using static Internalizer;
 
 
-public static class NuGet
+public static class NuGetHelper
 {
     private const string DefaultSource = "https://www.nuget.org/api/v2/package";
 
@@ -22,15 +24,20 @@ public static class NuGet
 
     public static void Pack(string pathToMetadataFolder, string outputFolder, string version = "")
     {
-        string versionArgument = "";
+        var spec = Directory.GetFiles(pathToMetadataFolder, "*.nuspec").Single();
+        var packageBuilder = new NuGet.Packaging.PackageBuilder(spec, (s) => null, false);
 
         if (!string.IsNullOrWhiteSpace(version))
         {
-            versionArgument = $"-version {version}";
+            packageBuilder.Version = new NuGet.Versioning.NuGetVersion(version);
         }
 
-        var spec = Directory.GetFiles(pathToMetadataFolder, "*.nuspec").Single();
-        Command.Execute("nuget", $"pack {spec} {versionArgument} -OutputDirectory {outputFolder}");
+        string pathToPackage = Path.Combine(outputFolder, $"{packageBuilder.Id}.nupkg");
+
+        using (var stream = new FileStream(pathToPackage, FileMode.Create, FileAccess.Write))
+        {
+            packageBuilder.Save(stream);
+        }
     }
 
     public static void CreateSourcePackage(string pathToRepository, string projectName, string outputFolder, params PackageReference[] dependencies)
@@ -45,7 +52,7 @@ public static class NuGet
         using (var disposableFolder = new DisposableFolder())
         {
             CreateSpecificationFromProject(pathToProjectFile, pathToBinaries, packageId, disposableFolder.Path);
-            NuGet.Pack(disposableFolder.Path, outputFolder);
+            Pack(disposableFolder.Path, outputFolder);
         }
     }
 
@@ -363,7 +370,7 @@ public static class NuGetUtils
                 WriteLine(File.ReadAllText(pathToNuGetMetadata));
 
 
-                NuGet.Pack(nugetPackFolder.Path, outputFolder);
+                NuGetHelper.Pack(nugetPackFolder.Path, outputFolder);
             }
         }
     }
