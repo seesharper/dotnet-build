@@ -23,7 +23,7 @@ public class NuGetTests
             Command.Execute("dotnet", $"new console -o {projectFolder.Path}");
             var outputFolder = Path.Combine(projectFolder.Path, "bin");
             DotNet.Publish(projectFolder.Path, outputFolder);
-            NuGet.PackAsTool(projectFolder.Path, outputFolder, projectFolder.Path);
+            NuGetHelper.PackAsTool(projectFolder.Path, outputFolder, projectFolder.Path);
         }
     }
 
@@ -32,7 +32,7 @@ public class NuGetTests
     {
         using (var targetFolder = new DisposableFolder())
         {
-            NuGet.Install("LightInject", targetFolder.Path);
+            NuGetHelper.Install("LightInject", targetFolder.Path);
             FindFile(targetFolder.Path, "LightInject.dll").Should().NotBeEmpty();
         }
     }
