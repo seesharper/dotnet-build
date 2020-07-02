@@ -3,7 +3,7 @@
 #load "FileUtils.csx"
 #load "Internalizer.csx"
 #load "DotNet.csx"
-#load "NuGet.Pack.csx"
+
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
 using static FileUtils;
