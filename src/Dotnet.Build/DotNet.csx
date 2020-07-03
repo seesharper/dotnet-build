@@ -3,6 +3,7 @@
 #load "CodeCoverageReportGenerator.csx"
 #load "BuildContext.csx"
 
+using System.Globalization;
 using System.Xml.Linq;
 using static FileUtils;
 
@@ -52,16 +53,46 @@ public static class DotNet
     /// </summary>
     /// <param name="pathToProjectFolder"></param>
     /// <param name="codeCoverageArtifactsFolder"></param>
-    public static void TestWithCodeCoverage(string projectName, string pathToTestProjectFolder, string codeCoverageArtifactsFolder, int threshold = 100, string targetFramework = null)
+    public static void TestWithCodeCoverage(string pathToTestProjectFolder, string codeCoverageArtifactsFolder, int threshold = 100, string targetFramework = null)
     {
         if (!string.IsNullOrWhiteSpace(targetFramework))
         {
             targetFramework = $" -f {targetFramework} ";
         }
-        //dotnet test -c release -f netcoreapp2.0 /p:CollectCoverage=true /p:Exclude="[xunit*]*%2c[*Tests*]*"
-        Command.Execute("dotnet", $"test -c release {targetFramework}  /property:CollectCoverage=true /property:Exclude=\"[xunit*]*%2c[*Tests*]*\" /property:CoverletOutputFormat=\\\"opencover,lcov,json\\\" /property:CoverletOutput={codeCoverageArtifactsFolder}/coverage /property:Threshold={threshold}", pathToTestProjectFolder);
-        var pathToOpenCoverResult = Path.Combine(codeCoverageArtifactsFolder, "coverage.opencover.xml");
-        CodeCoverageReportGenerator.Generate(pathToOpenCoverResult, $"{codeCoverageArtifactsFolder}/Report");
+
+        Command.Execute("dotnet", $"test -c release {targetFramework} --collect:\"XPlat Code Coverage\" --results-directory={codeCoverageArtifactsFolder} -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=lcov,cobertura", pathToTestProjectFolder);
+
+        var pathToTempCoberturaResults = FileUtils.FindFile(codeCoverageArtifactsFolder, "coverage.cobertura.xml");
+        var pathToTempLineCoverageResults = FileUtils.FindFile(codeCoverageArtifactsFolder, "coverage.info");
+        var pathToFuckedUpTempFolder = Path.GetDirectoryName(pathToTempCoberturaResults);
+
+        FileUtils.Copy(pathToTempCoberturaResults, codeCoverageArtifactsFolder);
+        FileUtils.Copy(pathToTempLineCoverageResults, codeCoverageArtifactsFolder);
+        FileUtils.RemoveDirectory(pathToFuckedUpTempFolder);
+
+        var pathToCoberturaResults = Path.Combine(codeCoverageArtifactsFolder, "coverage.cobertura.xml");
+        CheckCoberturaCoverage(pathToCoberturaResults, threshold);
+        CodeCoverageReportGenerator.Generate(pathToCoberturaResults, $"{codeCoverageArtifactsFolder}/Report");
+    }
+
+    private static void CheckCoberturaCoverage(string reportFile, int threshold)
+    {
+        var thresholdNormalized = 100.0;
+        var coverageXml = XDocument.Load(reportFile).Descendants("coverage");
+        var lineRate = double.Parse(coverageXml.Attributes("line-rate").FirstOrDefault().Value, CultureInfo.InvariantCulture) * 100;
+        var branchRate = double.Parse(coverageXml.Attributes("branch-rate").FirstOrDefault().Value, CultureInfo.InvariantCulture) * 100;
+
+        if (lineRate < thresholdNormalized)
+        {
+            throw new InvalidOperationException($"Line coverage < {thresholdNormalized} ({lineRate})");
+        }
+
+        if (branchRate < thresholdNormalized)
+        {
+            throw new InvalidOperationException($"Branch coverage < {thresholdNormalized} ({branchRate})");
+        }
+
+        Console.WriteLine($"Coverage OK (>= {thresholdNormalized})");
     }
 
     /// <summary>
@@ -73,7 +104,7 @@ public static class DotNet
         foreach (var testProject in testprojects)
         {
             var targetFramework = GetTargetFrameWork(testProject);
-            TestWithCodeCoverage(BuildContext.ProjectName, Path.GetDirectoryName(testProject), BuildContext.TestCoverageArtifactsFolder, BuildContext.CodeCoverageThreshold, targetFramework);
+            TestWithCodeCoverage(Path.GetDirectoryName(testProject), BuildContext.TestCoverageArtifactsFolder, BuildContext.CodeCoverageThreshold, targetFramework);
         }
 
         string GetTargetFrameWork(string pathToProjectFile)

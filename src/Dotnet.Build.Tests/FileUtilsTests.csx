@@ -8,7 +8,7 @@ using static FileUtils;
 using static ScriptUnit;
 
 // await AddTestsFrom<FileUtilsTests>().AddFilter(m => m.IsDefined(typeof(OnlyThisAttribute), true)).Execute();
-//await AddTestsFrom<FileUtilsTests>().Execute();
+// await AddTestsFrom<FileUtilsTests>().Execute();
 
 public class FileUtilsTests
 {
