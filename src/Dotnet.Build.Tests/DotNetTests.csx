@@ -66,17 +66,12 @@ public class DotNetTests
             var artifactsFolder = CreateDirectory(solutionFolder.Path, "Artifacts");
             var projectFolder = CreateDirectory(solutionFolder.Path, "SampleProject");
             Command.Execute("dotnet", $"new xunit", projectFolder);
-            Command.Execute("dotnet", "add package coverlet.msbuild", projectFolder);
+            Command.Execute("dotnet", "add package coverlet.collector", projectFolder);
             var csproj = FindFile(projectFolder, "*.csproj");
             var projectFile = XDocument.Load(FindFile(projectFolder, "*.csproj"));
-            var itemGroupElement = projectFile.Descendants("ItemGroup").First();
-            var cliToolReference = new XElement("DotNetCliToolReference", new XAttribute("Include", "dotnet-reportgenerator-cli"), new XAttribute("Version", "*"));
-            itemGroupElement.Add(cliToolReference);
             projectFile.Save(csproj);
 
-
-
-            DotNet.TestWithCodeCoverage("SampleProject", projectFolder, artifactsFolder, 0);
+            DotNet.TestWithCodeCoverage(projectFolder, artifactsFolder, 0);
         }
     }
 

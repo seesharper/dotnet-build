@@ -1,4 +1,4 @@
-#r "nuget:NuGet.Packaging, 4.6.4"
+#r "nuget:NuGet.Packaging, 5.6.0"
 #load "Command.csx"
 #load "FileUtils.csx"
 #load "Internalizer.csx"
