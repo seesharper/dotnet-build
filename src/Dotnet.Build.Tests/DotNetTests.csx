@@ -71,7 +71,7 @@ public class DotNetTests
             var projectFile = XDocument.Load(FindFile(projectFolder, "*.csproj"));
             projectFile.Save(csproj);
 
-            DotNet.TestWithCodeCoverage(projectFolder, artifactsFolder, 0);
+            DotNet.TestWithCodeCoverage(projectFolder, artifactsFolder, 100);
         }
     }
 

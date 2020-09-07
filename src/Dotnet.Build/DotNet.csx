@@ -71,13 +71,13 @@ public static class DotNet
         FileUtils.RemoveDirectory(pathToFuckedUpTempFolder);
 
         var pathToCoberturaResults = Path.Combine(codeCoverageArtifactsFolder, "coverage.cobertura.xml");
-        CheckCoberturaCoverage(pathToCoberturaResults, threshold);
         CodeCoverageReportGenerator.Generate(pathToCoberturaResults, $"{codeCoverageArtifactsFolder}/Report");
+        CheckCoberturaCoverage(pathToCoberturaResults, threshold);
     }
 
     private static void CheckCoberturaCoverage(string reportFile, int threshold)
     {
-        var thresholdNormalized = 100.0;
+        var thresholdNormalized = threshold;
         var coverageXml = XDocument.Load(reportFile).Descendants("coverage");
         var lineRate = double.Parse(coverageXml.Attributes("line-rate").FirstOrDefault().Value, CultureInfo.InvariantCulture) * 100;
         var branchRate = double.Parse(coverageXml.Attributes("branch-rate").FirstOrDefault().Value, CultureInfo.InvariantCulture) * 100;
@@ -92,7 +92,7 @@ public static class DotNet
             throw new InvalidOperationException($"Branch coverage < {thresholdNormalized} ({branchRate})");
         }
 
-        Console.WriteLine($"Coverage OK (>= {thresholdNormalized})");
+        Console.WriteLine($"Coverage OK (>= {thresholdNormalized}) Line({lineRate}) Branch ({branchRate})");
     }
 
     /// <summary>
