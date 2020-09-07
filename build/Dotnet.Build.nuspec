@@ -3,20 +3,20 @@
   <metadata>
     <id>Dotnet.Build</id>
     <title>Dotnet.Build</title>
-    <version>0.11.1>/version>
-      <description>Just a collection of dotnet-script compatible scripts to be used in build scripts.</description>
-      <authors>Bernhard Richter</authors>
-      <owners>Bernhard Richter</owners>
-      <projectUrl>https://github.com/seesharper/dotnet-build</projectUrl>
-      <licenseUrl>https://opensource.org/licenses/MIT</licenseUrl>
-      <tags>C# Build Scripting</tags>
-      <dependencies>
-        <dependency id="Octokit" version="0.27.0" />
-        <dependency id="ReportGenerator.Core" version="4.3.0" />
-        <dependency id="Microsoft.DotNet.PlatformAbstractions" version="2.0.3" />
-        <dependency id="github-changelog" version="0.1.5" />
-        <dependency id="NuGet.Packaging" version="5.6.0" />
+    <version>0.11.1</version>
+    <description>Just a collection of dotnet-script compatible scripts to be used in build scripts.</description>
+    <authors>Bernhard Richter</authors>
+    <owners>Bernhard Richter</owners>
+    <projectUrl>https://github.com/seesharper/dotnet-build</projectUrl>
+    <licenseUrl>https://opensource.org/licenses/MIT</licenseUrl>
+    <tags>C# Build Scripting</tags>
+    <dependencies>
+      <dependency id="Octokit" version="0.27.0" />
+      <dependency id="ReportGenerator.Core" version="4.3.0" />
+      <dependency id="Microsoft.DotNet.PlatformAbstractions" version="2.0.3" />
+      <dependency id="github-changelog" version="0.1.5" />
+      <dependency id="NuGet.Packaging" version="5.6.0" />
 
-      </dependencies>
-    </metadata>
-  </package>
+    </dependencies>
+  </metadata>
+</package>
