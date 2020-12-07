@@ -58,7 +58,7 @@ public class DotNetTests
         }
     }
 
-    [OnlyThis]
+
     public void ShouldAnalyzeCodeCoverageUsingCoverletAndReportGenerator()
     {
         using (var solutionFolder = new DisposableFolder())
@@ -106,6 +106,33 @@ public class DotNetTests
                 DotNet.Publish(projectFolder.Path, outputFolder.Path);
                 Directory.GetFiles(outputFolder.Path, "*.dll").Should().NotBeEmpty();
             }
+        }
+    }
+
+    [OnlyThis]
+    public void ShouldPublishWhenProjectIsPublishable()
+    {
+        using (var solutionFolder = new DisposableFolder())
+        {
+            var srcFolder = CreateDirectory(solutionFolder.Path, "src");
+            var buildFolder = CreateDirectory(solutionFolder.Path, "build");
+            var oldRepoFolder = BuildContext.RepositoryFolder;
+            BuildContext.RepositoryFolder = solutionFolder.Path;
+            using (var outputFolder = new DisposableFolder())
+            {
+                Command.Execute("dotnet", $"new console -o {srcFolder}");
+                var projectFile = FindFile(srcFolder, "*.csproj");
+                var document = XDocument.Load(projectFile);
+                var propertyGroupElement = document.Descendants("PropertyGroup").Single();
+                var isPublishableElement = new XElement("IsPublishable", true);
+                propertyGroupElement.Add(isPublishableElement);
+                document.Save(projectFile);
+                DotNet.Publish();
+
+                Directory.GetFiles(BuildContext.GitHubArtifactsFolder, "*.dll").Should().NotBeEmpty();
+            }
+
+            BuildContext.RepositoryFolder = oldRepoFolder;
         }
     }
 }

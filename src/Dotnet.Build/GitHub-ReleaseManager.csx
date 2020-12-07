@@ -41,8 +41,8 @@ public static class ReleaseManagement
 
             if (existingRelease != null)
             {
-                var releaseUpdate = new ReleaseUpdate();                
-                releaseUpdate.Body = releaseNotes;                
+                var releaseUpdate = new ReleaseUpdate();
+                releaseUpdate.Body = releaseNotes;
                 releaseUpdate.Name = tag;
 
                 await client.Repository.Release.Edit(_owner, _repository, existingRelease.Id, releaseUpdate);
@@ -50,7 +50,7 @@ public static class ReleaseManagement
             }
             else
             {
-                 var newRelease = new NewRelease(tag);
+                var newRelease = new NewRelease(tag);
                 newRelease.Name = tag;
                 newRelease.Body = releaseNotes;
                 newRelease.Draft = false;
@@ -59,7 +59,7 @@ public static class ReleaseManagement
                 var createdRelease = client.Repository.Release.Create(_owner, _repository, newRelease).Result;
 
                 await UploadReleaseAssets(releaseAssets, client, createdRelease);
-            }           
+            }
         }
 
         private static async Task UploadReleaseAssets(ReleaseAsset[] releaseAssets, GitHubClient client, Release release)
@@ -82,7 +82,7 @@ public static class ReleaseManagement
     {
         public ReleaseAsset(string path)
         {
-            Path = path;            
+            Path = path;
         }
 
         public string Path { get; }
@@ -97,5 +97,15 @@ public static class ReleaseManagement
 
         public override string ContentType => "application/zip";
     }
+
+    public class OctetStreamReleaseAsset : ReleaseAsset
+    {
+        public OctetStreamReleaseAsset(string path) : base(path)
+        {
+        }
+
+        public override string ContentType => "application/octet-stream";
+    }
+
 
 }

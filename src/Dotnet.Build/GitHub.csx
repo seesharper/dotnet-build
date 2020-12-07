@@ -22,7 +22,10 @@ public static class GitHub
 
     public async static Task Release()
     {
+        var assetsFiles = Directory.GetFiles(BuildContext.GitHubArtifactsFolder).Where(f => !f.Equals(BuildContext.GitHubReleaseNotesPath, StringComparison.InvariantCultureIgnoreCase)).ToArray();
+        var octetStreamAssets = assetsFiles.Select(f => new OctetStreamReleaseAsset(f)).ToArray();
+
         await ReleaseManagerFor(BuildContext.Owner, BuildContext.ProjectName, BuildEnvironment.GitHubAccessToken)
-       .CreateRelease(BuildContext.LatestTag, BuildContext.GitHubReleaseNotesPath, Array.Empty<ReleaseAsset>());
+       .CreateRelease(BuildContext.LatestTag, BuildContext.GitHubReleaseNotesPath, octetStreamAssets);
     }
 }
