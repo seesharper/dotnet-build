@@ -1,6 +1,7 @@
 #r "nuget: FluentAssertions, 5.6.0"
 #r "nuget:Octokit, 0.27.0"
 #load "../Dotnet.Build/FileUtils.csx"
+#load "../Dotnet.Build/GitHub.csx"
 #load "../Dotnet.Build/GitHub-ReleaseManager.csx"
 #load "nuget:ScriptUnit, 0.1.3"
 #load "TestUtils.csx"
@@ -11,7 +12,7 @@ using static ReleaseManagement;
 using static FileUtils;
 using static ScriptUnit;
 
-// await AddTestsFrom<ReleaseManagerTests>().AddFilter(m => m.IsDefined(typeof(OnlyThisAttribute), true)).Execute();
+//await AddTestsFrom<ReleaseManagerTests>().AddFilter(m => m.IsDefined(typeof(OnlyThisAttribute), true)).Execute();
 //await AddTestsFrom<ReleaseManagerTests>().Execute();
 
 public class ReleaseManagerTests
@@ -61,6 +62,36 @@ public class ReleaseManagerTests
         latestRelease.Name.Should().Be("0.1.0");
         latestRelease.Body.Should().Be("This is some release notes");
 
+    }
+
+    [OnlyThis]
+    public async Task ShouldUploadGitHubAssets()
+    {
+        var client = CreateClient();
+        await DeleteAllReleases(client);
+
+        using (var solutionFolder = new DisposableFolder())
+        {
+            Command.Execute("git", "clone https://github.com/seesharper/release-fixture.git", solutionFolder.Path);
+            var oldRepoFolder = BuildContext.RepositoryFolder;
+            BuildContext.RepositoryFolder = Path.Combine(solutionFolder.Path, "release-fixture");
+
+
+
+            var pathToReleaseNotes = Path.Combine(BuildContext.GitHubArtifactsFolder, "ReleaseNotes.md");
+            File.WriteAllText(pathToReleaseNotes, "This is some release notes");
+
+            var pathToSomeBinaryFile = Path.Combine(BuildContext.GitHubArtifactsFolder, "SomeBinaryFile");
+            File.WriteAllBytes(pathToSomeBinaryFile, new byte[] { 42 });
+
+            await GitHub.Release();
+
+            var latestRelease = await client.Repository.Release.GetLatest(Owner, Repository);
+            latestRelease.Assets.Should().Contain(a => a.Name == "SomeBinaryFile");
+
+            BuildContext.RepositoryFolder = oldRepoFolder;
+            //await ReleaseManagerFor(Owner, Repository, accessToken).CreateRelease("0.1.0", pathToReleaseNotes, new[] { new ZipReleaseAsset(pathToReleaseNotes) });
+        }
     }
 
 

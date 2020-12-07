@@ -41,7 +41,9 @@ public static class BuildContext
     public static string TestCoverageArtifactsFolder => testCoverageArtifactsFolder.Value;
     public static string[] TestProjects => FindProjectFiles().Where(IsTestProject).ToArray();
 
-    public static string[] PackableProjects => SourceProjects.Where(p => IsPackable(p)).ToArray();
+    public static string[] PackableProjects => SourceProjects.Where(IsPackable).ToArray();
+
+    public static string[] PublishableProjects => SourceProjects.Where(IsPublishable).ToArray();
 
     public static string[] SourceProjects => FindProjectFiles().Where(p => !IsTestProject(p)).ToArray();
 
@@ -95,6 +97,18 @@ public static class BuildContext
     }
 
     private static bool IsPackable(string pathToProjectFile)
+    {
+        var projectFile = XDocument.Load(pathToProjectFile);
+        var isPackable = projectFile.Descendants("IsPackable").SingleOrDefault()?.Value;
+        if (isPackable == null)
+        {
+            return true;
+        }
+
+        return isPackable.Equals(bool.TrueString, StringComparison.InvariantCultureIgnoreCase);
+    }
+
+    private static bool IsPublishable(string pathToProjectFile)
     {
         var projectFile = XDocument.Load(pathToProjectFile);
         var isPackable = projectFile.Descendants("IsPackable").SingleOrDefault()?.Value;

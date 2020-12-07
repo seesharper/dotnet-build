@@ -194,13 +194,24 @@ public static class DotNet
         Command.Execute("dotnet", args);
     }
 
-    private static string FindProjectFile(string pathToProjectFolder)
+    public static void Publish()
     {
-        if (GetPathType(pathToProjectFolder) == PathType.File)
+        var publishableProjects = BuildContext.PublishableProjects;
+        foreach (var publishableProject in publishableProjects)
         {
-            return pathToProjectFolder;
-        }
-
-        return Directory.GetFiles(pathToProjectFolder, "*.csproj").SingleOrDefault();
+            Command.Execute("dotnet", $"publish {publishableProject} -c release -o {BuildContext.GitHubArtifactsFolder}");
+        };
     }
+}
+
+
+
+private static string FindProjectFile(string pathToProjectFolder)
+{
+    if (GetPathType(pathToProjectFolder) == PathType.File)
+    {
+        return pathToProjectFolder;
+    }
+
+    return Directory.GetFiles(pathToProjectFolder, "*.csproj").SingleOrDefault();
 }
