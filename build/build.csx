@@ -28,7 +28,7 @@ Copy(Path.Combine(scriptFolder, "Dotnet.Build.nuspec"), Path.Combine(tempFolder,
 string pathToGitHubArtifacts = CreateDirectory(Path.Combine(scriptFolder, "Artifacts", "GitHub"));
 var accessToken = System.Environment.GetEnvironmentVariable("GITHUB_REPO_TOKEN");
 
-DotNet.Test(Path.Combine(scriptFolder, "..", "src", "DotNet.Build.Tests", "AllTests.csx"));
+DotNet.Test(Path.Combine(scriptFolder, "..", "src", "Dotnet.Build.Tests", "AllTests.csx"));
 
 string pathToNuGetArtifacts = CreateDirectory(Path.Combine(scriptFolder, "Artifacts", "NuGet"));
 NuGetHelper.Pack(tempFolder, pathToNuGetArtifacts);
