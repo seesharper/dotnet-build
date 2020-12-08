@@ -15,10 +15,10 @@ using static ScriptUnit;
 
 var testRunner = AddTestsFrom<CommandTests>()
     .AddTestsFrom<DotNetTests>()
-    .AddTestsFrom<GitTests>()
+    //.AddTestsFrom<GitTests>()
     .AddTestsFrom<LoggerTests>()
     .AddTestsFrom<FileUtilsTests>()
-    .AddTestsFrom<NuGetTests>()
+    //.AddTestsFrom<NuGetTests>()
     .AddTestsFrom<InternalizerTests>()
     .AddTestsFrom<BuildContextTests>();
 if (BuildEnvironment.IsSecure)
