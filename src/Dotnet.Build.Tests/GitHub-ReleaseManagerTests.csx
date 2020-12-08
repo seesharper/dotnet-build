@@ -12,7 +12,7 @@ using static ReleaseManagement;
 using static FileUtils;
 using static ScriptUnit;
 
-await AddTestsFrom<ReleaseManagerTests>().AddFilter(m => m.IsDefined(typeof(OnlyThisAttribute), true)).Execute();
+//await AddTestsFrom<ReleaseManagerTests>().AddFilter(m => m.IsDefined(typeof(OnlyThisAttribute), true)).Execute();
 //await AddTestsFrom<ReleaseManagerTests>().Execute();
 
 public class ReleaseManagerTests
