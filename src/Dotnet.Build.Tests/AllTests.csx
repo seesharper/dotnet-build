@@ -13,19 +13,19 @@
 
 using static ScriptUnit;
 
-var testRunner = new TestRunner();
 
-// var testRunner = AddTestsFrom<CommandTests>()
-//     .AddTestsFrom<DotNetTests>()
-//     //.AddTestsFrom<GitTests>()
-//     .AddTestsFrom<LoggerTests>()
-//     .AddTestsFrom<FileUtilsTests>()
-//     //.AddTestsFrom<NuGetTests>()
-//     .AddTestsFrom<InternalizerTests>()
-//     .AddTestsFrom<BuildContextTests>();
-if (BuildEnvironment.IsSecure)
-{
-    testRunner = testRunner.AddTestsFrom<ReleaseManagerTests>();
-}
+
+var testRunner = AddTestsFrom<CommandTests>()
+    .AddTestsFrom<DotNetTests>()
+    .AddTestsFrom<GitTests>()
+    .AddTestsFrom<LoggerTests>()
+    .AddTestsFrom<FileUtilsTests>()
+    //.AddTestsFrom<NuGetTests>()
+    .AddTestsFrom<InternalizerTests>()
+    .AddTestsFrom<BuildContextTests>();
+// if (BuildEnvironment.IsSecure)
+// {
+//     testRunner = testRunner.AddTestsFrom<ReleaseManagerTests>();
+// }
 
 return await testRunner.Execute();
