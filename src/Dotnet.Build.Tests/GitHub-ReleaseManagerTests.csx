@@ -12,7 +12,7 @@ using static ReleaseManagement;
 using static FileUtils;
 using static ScriptUnit;
 
-//await AddTestsFrom<ReleaseManagerTests>().AddFilter(m => m.IsDefined(typeof(OnlyThisAttribute), true)).Execute();
+await AddTestsFrom<ReleaseManagerTests>().AddFilter(m => m.IsDefined(typeof(OnlyThisAttribute), true)).Execute();
 //await AddTestsFrom<ReleaseManagerTests>().Execute();
 
 public class ReleaseManagerTests
@@ -39,7 +39,7 @@ public class ReleaseManagerTests
         latestRelease.Body.Should().Be("This is some release notes");
     }
 
-
+    [OnlyThis]
     public async Task ShouldUpdateRelease()
     {
         var accessToken = System.Environment.GetEnvironmentVariable("GITHUB_REPO_TOKEN");
@@ -61,10 +61,9 @@ public class ReleaseManagerTests
         var latestRelease = await client.Repository.Release.GetLatest(Owner, Repository);
         latestRelease.Name.Should().Be("0.1.0");
         latestRelease.Body.Should().Be("This is some release notes");
-
     }
 
-    [OnlyThis]
+
     public async Task ShouldUploadGitHubAssets()
     {
         var client = CreateClient();
