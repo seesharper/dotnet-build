@@ -6,7 +6,7 @@
 using FluentAssertions;
 using static ScriptUnit;
 
-await AddTestsFrom<CommandTests>().AddFilter(m => m.IsDefined(typeof(OnlyThisAttribute), true)).Execute();
+//await AddTestsFrom<CommandTests>().AddFilter(m => m.IsDefined(typeof(OnlyThisAttribute), true)).Execute();
 
 //await AddTestsFrom<CommandTests>().Execute();
 

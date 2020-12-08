@@ -5,6 +5,7 @@
 #load "../Dotnet.Build.Tests/FileUtilsTests.csx"
 #load "../Dotnet.Build.Tests/NuGetTests.csx"
 #load "../Dotnet.Build.Tests/BuildContextTests.csx"
+#load "../Dotnet.Build.Tests/InternalizerTests.csx"
 #load "../Dotnet.Build.Tests/GitHub-ReleaseManagerTests.csx"
 #load "../Dotnet.Build/BuildEnvironment.csx"
 
@@ -18,6 +19,7 @@ var testRunner = AddTestsFrom<CommandTests>()
     .AddTestsFrom<LoggerTests>()
     .AddTestsFrom<FileUtilsTests>()
     .AddTestsFrom<NuGetTests>()
+    .AddTestsFrom<InternalizerTests>()
     .AddTestsFrom<BuildContextTests>();
 if (BuildEnvironment.IsSecure)
 {

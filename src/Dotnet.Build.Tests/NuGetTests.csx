@@ -12,7 +12,7 @@ using static FileUtils;
 using FluentAssertions;
 
 
-return await AddTestsFrom<NuGetTests>().Execute();
+//return await AddTestsFrom<NuGetTests>().Execute();
 //return await AddTestsFrom<NuGetTests>().AddFilter(m => m.IsDefined(typeof(OnlyThisAttribute), true)).Execute();
 public class NuGetTests
 {

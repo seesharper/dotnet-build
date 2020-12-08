@@ -1,8 +1,6 @@
 #r "nuget: FluentAssertions, 5.6.0"
 #load "../Dotnet.Build/Command.csx"
 #load "../Dotnet.Build/DotNet.csx"
-#load "../Dotnet.Build/xUnit.csx"
-
 #load "nuget:ScriptUnit, 0.1.3"
 #load "TestUtils.csx"
 
@@ -13,6 +11,8 @@ using static FileUtils;
 using System.Xml.Linq;
 
 //await AddTestsFrom<DotNetTests>().AddFilter(m => m.IsDefined(typeof(OnlyThisAttribute), true)).Execute();
+
+//await AddTestsFrom<DotNetTests>().Execute();
 
 public class DotNetTests
 {
@@ -44,20 +44,6 @@ public class DotNetTests
             DotNet.Test(projectFolder.Path);
         }
     }
-
-
-    public void ShouldAnalyzeCodeCoverageWithxUnit()
-    {
-        using (var projectFolder = new DisposableFolder())
-        {
-            Command.Execute("dotnet", $"new xunit -o {projectFolder.Path} -n TestProject");
-            ReplaceInFile("<TargetFramework.*", "<TargetFramework>net46</TargetFramework><DebugType>full</DebugType>", Path.Combine(projectFolder.Path, "TestProject.csproj"));
-            DotNet.Build(projectFolder.Path);
-            var testAssembly = FindFile(Path.Combine(projectFolder.Path, "bin"), "TestProject.dll");
-            xUnit.AnalyzeCodeCoverage(testAssembly);
-        }
-    }
-
 
     public void ShouldAnalyzeCodeCoverageUsingCoverletAndReportGenerator()
     {
@@ -109,7 +95,7 @@ public class DotNetTests
         }
     }
 
-    [OnlyThis]
+    //[OnlyThis]
     public void ShouldPublishWhenProjectIsPublishable()
     {
         using (var solutionFolder = new DisposableFolder())
@@ -130,6 +116,56 @@ public class DotNetTests
                 DotNet.Publish();
 
                 Directory.GetFiles(BuildContext.GitHubArtifactsFolder, "*.dll").Should().NotBeEmpty();
+            }
+
+            BuildContext.RepositoryFolder = oldRepoFolder;
+        }
+    }
+
+
+    //[OnlyThis]
+    public void ShouldNotPublishWhenProjectIsPublishableIsSetToFalse()
+    {
+        using (var solutionFolder = new DisposableFolder())
+        {
+            var srcFolder = CreateDirectory(solutionFolder.Path, "src");
+            var buildFolder = CreateDirectory(solutionFolder.Path, "build");
+            var oldRepoFolder = BuildContext.RepositoryFolder;
+            BuildContext.RepositoryFolder = solutionFolder.Path;
+            using (var outputFolder = new DisposableFolder())
+            {
+                Command.Execute("dotnet", $"new console -o {srcFolder}");
+                var projectFile = FindFile(srcFolder, "*.csproj");
+                var document = XDocument.Load(projectFile);
+                var propertyGroupElement = document.Descendants("PropertyGroup").Single();
+                var isPublishableElement = new XElement("IsPublishable", false);
+                propertyGroupElement.Add(isPublishableElement);
+                document.Save(projectFile);
+                DotNet.Publish();
+
+                Directory.GetFiles(BuildContext.GitHubArtifactsFolder, "*.dll").Should().BeEmpty();
+            }
+
+            BuildContext.RepositoryFolder = oldRepoFolder;
+        }
+    }
+
+    //[OnlyThis]
+    public void ShouldNotPublishWhenProjectIsPublishablePropertyIsMissing()
+    {
+        using (var solutionFolder = new DisposableFolder())
+        {
+            var srcFolder = CreateDirectory(solutionFolder.Path, "src");
+            var buildFolder = CreateDirectory(solutionFolder.Path, "build");
+            var oldRepoFolder = BuildContext.RepositoryFolder;
+            BuildContext.RepositoryFolder = solutionFolder.Path;
+            using (var outputFolder = new DisposableFolder())
+            {
+                Command.Execute("dotnet", $"new console -o {srcFolder}");
+                var projectFile = FindFile(srcFolder, "*.csproj");
+                DotNet.Publish();
+
+                Directory.GetFiles(BuildContext.GitHubArtifactsFolder, "*.dll").Should().BeEmpty();
             }
 
             BuildContext.RepositoryFolder = oldRepoFolder;
