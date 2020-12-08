@@ -1,5 +1,5 @@
 #r "nuget: FluentAssertions, 5.6.0"
-#r "nuget:Octokit, 0.27.0"
+#r "nuget:Octokit, 0.48.0"
 #load "../Dotnet.Build/FileUtils.csx"
 #load "../Dotnet.Build/GitHub.csx"
 #load "../Dotnet.Build/GitHub-ReleaseManager.csx"
@@ -13,7 +13,7 @@ using static FileUtils;
 using static ScriptUnit;
 
 //await AddTestsFrom<ReleaseManagerTests>().AddFilter(m => m.IsDefined(typeof(OnlyThisAttribute), true)).Execute();
-//await AddTestsFrom<ReleaseManagerTests>().Execute();
+await AddTestsFrom<ReleaseManagerTests>().Execute();
 
 public class ReleaseManagerTests
 {
