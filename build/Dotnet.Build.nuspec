@@ -3,7 +3,7 @@
   <metadata>
     <id>Dotnet.Build</id>
     <title>Dotnet.Build</title>
-    <version>0.12.0</version>
+    <version>0.12.1</version>
     <description>Just a collection of dotnet-script compatible scripts to be used in build scripts.</description>
     <authors>Bernhard Richter</authors>
     <owners>Bernhard Richter</owners>
@@ -11,7 +11,7 @@
     <licenseUrl>https://opensource.org/licenses/MIT</licenseUrl>
     <tags>C# Build Scripting</tags>
     <dependencies>
-      <dependency id="Octokit" version="0.27.0" />
+      <dependency id="Octokit" version="0.48.0" />
       <dependency id="ReportGenerator.Core" version="4.3.0" />
       <dependency id="Microsoft.DotNet.PlatformAbstractions" version="2.0.3" />
       <dependency id="github-changelog" version="0.1.5" />

@@ -1,5 +1,5 @@
 #r "nuget: FluentAssertions, 5.6.0"
-#r "nuget:Octokit, 0.27.0"
+#r "nuget:Octokit, 0.48.0"
 #load "../Dotnet.Build/FileUtils.csx"
 #load "../Dotnet.Build/GitHub.csx"
 #load "../Dotnet.Build/GitHub-ReleaseManager.csx"
@@ -39,7 +39,7 @@ public class ReleaseManagerTests
         latestRelease.Body.Should().Be("This is some release notes");
     }
 
-
+    [OnlyThis]
     public async Task ShouldUpdateRelease()
     {
         var accessToken = System.Environment.GetEnvironmentVariable("GITHUB_REPO_TOKEN");
@@ -61,10 +61,9 @@ public class ReleaseManagerTests
         var latestRelease = await client.Repository.Release.GetLatest(Owner, Repository);
         latestRelease.Name.Should().Be("0.1.0");
         latestRelease.Body.Should().Be("This is some release notes");
-
     }
 
-    [OnlyThis]
+
     public async Task ShouldUploadGitHubAssets()
     {
         var client = CreateClient();

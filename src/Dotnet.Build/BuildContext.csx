@@ -7,17 +7,28 @@ using static FileUtils;
 
 public static class BuildContext
 {
-    private static Lazy<string> artifactsFolder = new Lazy<string>(() => CreateDirectory(BuildFolder, "Artifacts"));
+    private static Lazy<string> artifactsFolder;
 
-    private static Lazy<string> nugetArtifactsFolder = new Lazy<string>(() => CreateDirectory(ArtifactsFolder, "NuGet"));
+    private static Lazy<string> nugetArtifactsFolder;
 
-    private static Lazy<string> gitHubArtifactsFolder = new Lazy<string>(() => CreateDirectory(ArtifactsFolder, "GitHub"));
+    private static Lazy<string> gitHubArtifactsFolder;
 
-    private static Lazy<string> testCoverageArtifactsFolder = new Lazy<string>(() => CreateDirectory(ArtifactsFolder, "TestCoverage"));
+    private static Lazy<string> testCoverageArtifactsFolder;
+
+    private static string repositoryFolder;
 
     static BuildContext()
     {
         RepositoryFolder = Git.Default.GetRepositoryInfo().RootFolder;
+        InitializeBuildContext();
+    }
+
+    private static void InitializeBuildContext()
+    {
+        artifactsFolder = new Lazy<string>(() => CreateDirectory(BuildFolder, "Artifacts"));
+        nugetArtifactsFolder = new Lazy<string>(() => CreateDirectory(ArtifactsFolder, "NuGet"));
+        gitHubArtifactsFolder = new Lazy<string>(() => CreateDirectory(ArtifactsFolder, "GitHub"));
+        testCoverageArtifactsFolder = new Lazy<string>(() => CreateDirectory(ArtifactsFolder, "TestCoverage"));
     }
 
     public static string Owner => Git.Open(RepositoryFolder).GetRepositoryInfo().Owner;
@@ -26,7 +37,7 @@ public static class BuildContext
 
     public static string BuildFolder => FindFolder("build");
 
-    public static string RepositoryFolder { get; set; }
+    public static string RepositoryFolder { get => repositoryFolder; set { repositoryFolder = value; InitializeBuildContext(); } }
 
     public static string SourceFolder => FindFolder("src");
 
@@ -111,13 +122,13 @@ public static class BuildContext
     private static bool IsPublishable(string pathToProjectFile)
     {
         var projectFile = XDocument.Load(pathToProjectFile);
-        var isPackable = projectFile.Descendants("IsPackable").SingleOrDefault()?.Value;
-        if (isPackable == null)
+        var isPublishable = projectFile.Descendants("IsPublishable").SingleOrDefault()?.Value;
+        if (isPublishable == null)
         {
-            return true;
+            return false;
         }
 
-        return isPackable.Equals(bool.TrueString, StringComparison.InvariantCultureIgnoreCase);
+        return isPublishable.Equals(bool.TrueString, StringComparison.InvariantCultureIgnoreCase);
     }
 
     private static bool IsLibrary(string pathToProjectFile)

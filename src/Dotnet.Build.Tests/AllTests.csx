@@ -5,6 +5,7 @@
 #load "../Dotnet.Build.Tests/FileUtilsTests.csx"
 #load "../Dotnet.Build.Tests/NuGetTests.csx"
 #load "../Dotnet.Build.Tests/BuildContextTests.csx"
+#load "../Dotnet.Build.Tests/InternalizerTests.csx"
 #load "../Dotnet.Build.Tests/GitHub-ReleaseManagerTests.csx"
 #load "../Dotnet.Build/BuildEnvironment.csx"
 
@@ -12,16 +13,19 @@
 
 using static ScriptUnit;
 
+
+
 var testRunner = AddTestsFrom<CommandTests>()
     .AddTestsFrom<DotNetTests>()
     .AddTestsFrom<GitTests>()
     .AddTestsFrom<LoggerTests>()
     .AddTestsFrom<FileUtilsTests>()
-    .AddTestsFrom<NuGetTests>()
+    //.AddTestsFrom<NuGetTests>()
+    .AddTestsFrom<InternalizerTests>()
     .AddTestsFrom<BuildContextTests>();
-if (BuildEnvironment.IsSecure)
-{
-    testRunner = testRunner.AddTestsFrom<ReleaseManagerTests>();
-}
+// if (BuildEnvironment.IsSecure)
+// {
+//     testRunner = testRunner.AddTestsFrom<ReleaseManagerTests>();
+// }
 
 return await testRunner.Execute();

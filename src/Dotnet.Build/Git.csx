@@ -36,7 +36,7 @@ public class GitRepository
         {
             return Command.Capture("git", $"{command}");
         }
-        return Command.Capture("git", $"-C {Path} {command}");
+        return Command.Capture("git", $"-C {Path} {command}", Path);
 
     }
 
