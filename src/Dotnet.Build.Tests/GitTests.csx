@@ -23,18 +23,6 @@ private static GitRepository Init(this DisposableFolder disposableFolder)
 
 public class GitTests
 {
-
-    [OnlyThis]
-    public void SimpleTest()
-    {
-        using (var folder = new DisposableFolder())
-        {
-            Command.Capture("git", $"-C {folder.Path} init", folder.Path).EnsureSuccessfulExitCode().Dump();
-            Command.Capture("git", $"-C {folder.Path} commit --allow-empty -m \"First Commit\"", folder.Path).EnsureSuccessfulExitCode().Dump();
-            Command.Capture("git", $"-C {folder.Path} rev-list HEAD --max-count=1", folder.Path).EnsureSuccessfulExitCode().Dump();
-        }
-    }
-
     public void ShouldGetCurrentCommitHash()
     {
         using (var folder = new DisposableFolder())
@@ -110,7 +98,7 @@ public class GitTests
         }
     }
 
-    //[OnlyThis]
+
     public void ShouldDetectUnstagedFiles()
     {
         using (var folder = new DisposableFolder())
