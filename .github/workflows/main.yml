@@ -14,6 +14,10 @@ jobs:
           dotnet-version: 3.1.101
       - name: Install dotnet-script
         run: dotnet tool install -g dotnet-script 
+      - name: Configure email for git releated tests
+        run: git config --global user.email "bernhard.richter@gmail.com"
+      - name: Configure username for git releated tests  
+        run: git config --global user.name "seesharper"
 
       - name: Run build script
         run: dotnet script build/build.csx
