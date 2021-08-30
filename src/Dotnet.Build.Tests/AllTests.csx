@@ -23,9 +23,9 @@ var testRunner = AddTestsFrom<CommandTests>()
     .AddTestsFrom<NuGetTests>()
     .AddTestsFrom<InternalizerTests>()
     .AddTestsFrom<BuildContextTests>();
-if (BuildEnvironment.IsSecure)
-{
-    testRunner = testRunner.AddTestsFrom<ReleaseManagerTests>();
-}
+// if (BuildEnvironment.IsSecure)
+// {
+//     testRunner = testRunner.AddTestsFrom<ReleaseManagerTests>();
+// }
 
 return await testRunner.Execute();
