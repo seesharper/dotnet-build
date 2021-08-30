@@ -104,7 +104,28 @@ public static class BuildContext
 
     private static bool IsTestProject(string pathToProjectFile)
     {
-        return pathToProjectFile.Contains("tests", StringComparison.OrdinalIgnoreCase);
+        return pathToProjectFile.Contains("tests", StringComparison.OrdinalIgnoreCase) || HasIsTestProjectProperty(pathToProjectFile);
+    }
+
+    private static bool HasIsTestProjectProperty(string pathToProjectFile)
+    {
+        var projectFile = XDocument.Load(pathToProjectFile);
+        var isTestProjectElement = projectFile.Descendants("IsTestProject").SingleOrDefault();
+        if (isTestProjectElement == null)
+        {
+            return false;
+        }
+        else
+        {
+            if (isTestProjectElement.Value == null)
+            {
+                return true;
+            }
+            else
+            {
+                return isTestProjectElement.Value.Equals("true", StringComparison.OrdinalIgnoreCase);
+            }
+        }
     }
 
     private static bool IsPackable(string pathToProjectFile)
