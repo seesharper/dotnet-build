@@ -1,4 +1,4 @@
-#r "nuget:Microsoft.DotNet.PlatformAbstractions, 2.0.3"
+#r "nuget:Microsoft.DotNet.PlatformAbstractions, 3.1.0"
 #load "Git.csx"
 using System.Runtime.InteropServices;
 

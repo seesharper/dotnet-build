@@ -3,7 +3,7 @@
   <metadata>
     <id>Dotnet.Build</id>
     <title>Dotnet.Build</title>
-    <version>0.12.1</version>
+    <version>0.13.0</version>
     <description>Just a collection of dotnet-script compatible scripts to be used in build scripts.</description>
     <authors>Bernhard Richter</authors>
     <owners>Bernhard Richter</owners>

@@ -20,7 +20,7 @@ var testRunner = AddTestsFrom<CommandTests>()
     .AddTestsFrom<GitTests>()
     .AddTestsFrom<LoggerTests>()
     .AddTestsFrom<FileUtilsTests>()
-    //.AddTestsFrom<NuGetTests>()
+    .AddTestsFrom<NuGetTests>()
     .AddTestsFrom<InternalizerTests>()
     .AddTestsFrom<BuildContextTests>();
 // if (BuildEnvironment.IsSecure)
