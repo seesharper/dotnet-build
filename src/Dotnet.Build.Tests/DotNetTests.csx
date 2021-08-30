@@ -45,22 +45,24 @@ public class DotNetTests
         }
     }
 
+    [OnlyThis]
     public void ShouldAnalyzeCodeCoverageUsingCoverletAndReportGenerator()
     {
         using (var solutionFolder = new DisposableFolder())
         {
-            var artifactsFolder = CreateDirectory(solutionFolder.Path, "Artifacts");
-            var projectFolder = CreateDirectory(solutionFolder.Path, "SampleProject");
-            Command.Execute("dotnet", $"new xunit", projectFolder);
-            Command.Execute("dotnet", "add package coverlet.collector", projectFolder);
-            var csproj = FindFile(projectFolder, "*.csproj");
-            var projectFile = XDocument.Load(FindFile(projectFolder, "*.csproj"));
-            projectFile.Save(csproj);
-
-            DotNet.TestWithCodeCoverage(projectFolder, artifactsFolder, 100);
+            //Command.Execute("dotnet", "new sln");
+            var srcFolder = CreateDirectory(solutionFolder.Path, "src");
+            var buildFolder = CreateDirectory(solutionFolder.Path, "build");
+            var artifactsFolder = CreateDirectory(buildFolder, "Artifacts");
+            var projectFolder = CreateDirectory(srcFolder, "SampleProject");
+            var testFolder = CreateDirectory(srcFolder, "SampleProjects.Tests");
+            Command.Execute("dotnet", $"new classlib", projectFolder);
+            Command.Execute("dotnet", $"new xunit", testFolder);
+            Command.Execute("dotnet", "add package coverlet.collector", testFolder);
+            Command.Execute("dotnet", "add reference ../SampleProject", testFolder);
+            DotNet.TestWithCodeCoverage(testFolder, artifactsFolder, 100);
         }
     }
-
 
     public void ShouldExecuteScriptTests()
     {
@@ -96,79 +98,79 @@ public class DotNetTests
     }
 
     //[OnlyThis]
-    public void ShouldPublishWhenProjectIsPublishable()
-    {
-        using (var solutionFolder = new DisposableFolder())
-        {
-            var srcFolder = CreateDirectory(solutionFolder.Path, "src");
-            var buildFolder = CreateDirectory(solutionFolder.Path, "build");
-            var oldRepoFolder = BuildContext.RepositoryFolder;
-            BuildContext.RepositoryFolder = solutionFolder.Path;
-            using (var outputFolder = new DisposableFolder())
-            {
-                Command.Execute("dotnet", $"new console -o {srcFolder}");
-                var projectFile = FindFile(srcFolder, "*.csproj");
-                var document = XDocument.Load(projectFile);
-                var propertyGroupElement = document.Descendants("PropertyGroup").Single();
-                var isPublishableElement = new XElement("IsPublishable", true);
-                propertyGroupElement.Add(isPublishableElement);
-                document.Save(projectFile);
-                DotNet.Publish();
+    // public void ShouldPublishWhenProjectIsPublishable()
+    // {
+    //     using (var solutionFolder = new DisposableFolder())
+    //     {
+    //         var srcFolder = CreateDirectory(solutionFolder.Path, "src");
+    //         var buildFolder = CreateDirectory(solutionFolder.Path, "build");
+    //         var oldRepoFolder = BuildContext.RepositoryFolder;
+    //         BuildContext.RepositoryFolder = solutionFolder.Path;
+    //         using (var outputFolder = new DisposableFolder())
+    //         {
+    //             Command.Execute("dotnet", $"new console -o {srcFolder}");
+    //             var projectFile = FindFile(srcFolder, "*.csproj");
+    //             var document = XDocument.Load(projectFile);
+    //             var propertyGroupElement = document.Descendants("PropertyGroup").Single();
+    //             var isPublishableElement = new XElement("IsPublishable", true);
+    //             propertyGroupElement.Add(isPublishableElement);
+    //             document.Save(projectFile);
+    //             DotNet.Publish();
 
-                Directory.GetFiles(BuildContext.GitHubArtifactsFolder, "*.dll").Should().NotBeEmpty();
-            }
+    //             Directory.GetFiles(BuildContext.GitHubArtifactsFolder, "*.dll").Should().NotBeEmpty();
+    //         }
 
-            BuildContext.RepositoryFolder = oldRepoFolder;
-        }
-    }
+    //         BuildContext.RepositoryFolder = oldRepoFolder;
+    //     }
+    // }
 
 
-    //[OnlyThis]
-    public void ShouldNotPublishWhenProjectIsPublishableIsSetToFalse()
-    {
-        using (var solutionFolder = new DisposableFolder())
-        {
-            var srcFolder = CreateDirectory(solutionFolder.Path, "src");
-            var buildFolder = CreateDirectory(solutionFolder.Path, "build");
-            var oldRepoFolder = BuildContext.RepositoryFolder;
-            BuildContext.RepositoryFolder = solutionFolder.Path;
-            using (var outputFolder = new DisposableFolder())
-            {
-                Command.Execute("dotnet", $"new console -o {srcFolder}");
-                var projectFile = FindFile(srcFolder, "*.csproj");
-                var document = XDocument.Load(projectFile);
-                var propertyGroupElement = document.Descendants("PropertyGroup").Single();
-                var isPublishableElement = new XElement("IsPublishable", false);
-                propertyGroupElement.Add(isPublishableElement);
-                document.Save(projectFile);
-                DotNet.Publish();
+    // //[OnlyThis]
+    // public void ShouldNotPublishWhenProjectIsPublishableIsSetToFalse()
+    // {
+    //     using (var solutionFolder = new DisposableFolder())
+    //     {
+    //         var srcFolder = CreateDirectory(solutionFolder.Path, "src");
+    //         var buildFolder = CreateDirectory(solutionFolder.Path, "build");
+    //         var oldRepoFolder = BuildContext.RepositoryFolder;
+    //         BuildContext.RepositoryFolder = solutionFolder.Path;
+    //         using (var outputFolder = new DisposableFolder())
+    //         {
+    //             Command.Execute("dotnet", $"new console -o {srcFolder}");
+    //             var projectFile = FindFile(srcFolder, "*.csproj");
+    //             var document = XDocument.Load(projectFile);
+    //             var propertyGroupElement = document.Descendants("PropertyGroup").Single();
+    //             var isPublishableElement = new XElement("IsPublishable", false);
+    //             propertyGroupElement.Add(isPublishableElement);
+    //             document.Save(projectFile);
+    //             DotNet.Publish();
 
-                Directory.GetFiles(BuildContext.GitHubArtifactsFolder, "*.dll").Should().BeEmpty();
-            }
+    //             Directory.GetFiles(BuildContext.GitHubArtifactsFolder, "*.dll").Should().BeEmpty();
+    //         }
 
-            BuildContext.RepositoryFolder = oldRepoFolder;
-        }
-    }
+    //         BuildContext.RepositoryFolder = oldRepoFolder;
+    //     }
+    // }
 
-    //[OnlyThis]
-    public void ShouldNotPublishWhenProjectIsPublishablePropertyIsMissing()
-    {
-        using (var solutionFolder = new DisposableFolder())
-        {
-            var srcFolder = CreateDirectory(solutionFolder.Path, "src");
-            var buildFolder = CreateDirectory(solutionFolder.Path, "build");
-            var oldRepoFolder = BuildContext.RepositoryFolder;
-            BuildContext.RepositoryFolder = solutionFolder.Path;
-            using (var outputFolder = new DisposableFolder())
-            {
-                Command.Execute("dotnet", $"new console -o {srcFolder}");
-                var projectFile = FindFile(srcFolder, "*.csproj");
-                DotNet.Publish();
+    // //[OnlyThis]
+    // public void ShouldNotPublishWhenProjectIsPublishablePropertyIsMissing()
+    // {
+    //     using (var solutionFolder = new DisposableFolder())
+    //     {
+    //         var srcFolder = CreateDirectory(solutionFolder.Path, "src");
+    //         var buildFolder = CreateDirectory(solutionFolder.Path, "build");
+    //         var oldRepoFolder = BuildContext.RepositoryFolder;
+    //         BuildContext.RepositoryFolder = solutionFolder.Path;
+    //         using (var outputFolder = new DisposableFolder())
+    //         {
+    //             Command.Execute("dotnet", $"new console -o {srcFolder}");
+    //             var projectFile = FindFile(srcFolder, "*.csproj");
+    //             DotNet.Publish();
 
-                Directory.GetFiles(BuildContext.GitHubArtifactsFolder, "*.dll").Should().BeEmpty();
-            }
+    //             Directory.GetFiles(BuildContext.GitHubArtifactsFolder, "*.dll").Should().BeEmpty();
+    //         }
 
-            BuildContext.RepositoryFolder = oldRepoFolder;
-        }
-    }
+    //         BuildContext.RepositoryFolder = oldRepoFolder;
+    //     }
+    // }
 }
