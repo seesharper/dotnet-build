@@ -26,6 +26,9 @@ public class GitRepository
     public GitRepository(string path = null)
     {
         Path = path;
+        // Force an reindex
+        //https://stackoverflow.com/questions/49185186/fix-git-diff-files-listing-all-files-in-docker
+        Execute("diff --quiet");
     }
 
     public string Path { get; }
