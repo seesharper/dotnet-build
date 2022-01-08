@@ -104,16 +104,11 @@ public static class BuildContext
 
     private static bool IsTestProject(string pathToProjectFile)
     {
-        return pathToProjectFile.Contains("tests", StringComparison.OrdinalIgnoreCase) || HasIsTestProjectProperty(pathToProjectFile);
-    }
-
-    private static bool HasIsTestProjectProperty(string pathToProjectFile)
-    {
         var projectFile = XDocument.Load(pathToProjectFile);
         var isTestProjectElement = projectFile.Descendants("IsTestProject").SingleOrDefault();
         if (isTestProjectElement == null)
         {
-            return false;
+            return pathToProjectFile.Contains("tests", StringComparison.OrdinalIgnoreCase);
         }
         else
         {
