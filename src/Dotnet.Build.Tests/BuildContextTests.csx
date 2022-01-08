@@ -72,7 +72,7 @@ public class BuildContextTests
         }
     }
 
-    [OnlyThis]
+    //[OnlyThis]
     public void ShouldNotResolveTestableProjectsWhenProjectNameContainerIsTestProjectPropertySetTofalse()
     {
         using (var projectFolder = new DisposableFolder())
@@ -80,6 +80,24 @@ public class BuildContextTests
             var srcDir = CreateDirectory(projectFolder.Path, "src");
             Command.Execute("dotnet", $"new xunit --name Sample.xUnit", srcDir);
             var projectFilename = Path.Combine(srcDir, "Sample.xUnit", "Sample.xUnit.csproj");
+            var projectFile = XDocument.Load(projectFilename);
+            var propertyGroupElement = projectFile.Descendants("PropertyGroup").Single();
+            propertyGroupElement.Add(new XElement("IsTestProject", false));
+            projectFile.Save(projectFilename);
+
+            BuildContext.RepositoryFolder = projectFolder.Path;
+            BuildContext.TestProjects.Count().Should().Be(0);
+        }
+    }
+
+    [OnlyThis]
+    public void ShouldNotResolveTestableProjectsWhenProjectNameContainerIsTestProjectPropertySetToFalseAndNameContainsTests()
+    {
+        using (var projectFolder = new DisposableFolder())
+        {
+            var srcDir = CreateDirectory(projectFolder.Path, "src");
+            Command.Execute("dotnet", $"new xunit --name Sample.xUnit.Tests", srcDir);
+            var projectFilename = Path.Combine(srcDir, "Sample.xUnit.Tests", "Sample.xUnit.Tests.csproj");
             var projectFile = XDocument.Load(projectFilename);
             var propertyGroupElement = projectFile.Descendants("PropertyGroup").Single();
             propertyGroupElement.Add(new XElement("IsTestProject", false));
