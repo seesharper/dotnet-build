@@ -60,7 +60,18 @@ public static class DotNet
             targetFramework = $" -f {targetFramework} ";
         }
 
-        Command.Execute("dotnet", $"test -c release {targetFramework} --collect:\"XPlat Code Coverage\" --results-directory={codeCoverageArtifactsFolder} -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=lcov,cobertura", pathToTestProjectFolder);
+        var settingsFile = FindFile(pathToTestProjectFolder, "coverlet.runsettings");
+        if (settingsFile == null)
+        {
+            Command.Execute("dotnet", $"test -c release {targetFramework} --collect:\"XPlat Code Coverage\" --results-directory={codeCoverageArtifactsFolder} -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=lcov,cobertura", pathToTestProjectFolder);
+        }
+        else
+        {
+            Error.WriteLine($"Found runsettings file at {settingsFile}");
+            Command.Execute("dotnet", $"test -c release {targetFramework} --collect:\"XPlat Code Coverage\" --results-directory={codeCoverageArtifactsFolder} --settings {settingsFile}", pathToTestProjectFolder);
+        }
+
+
 
         var pathToTempCoberturaResults = FileUtils.FindFile(codeCoverageArtifactsFolder, "coverage.cobertura.xml");
         var pathToTempLineCoverageResults = FileUtils.FindFile(codeCoverageArtifactsFolder, "coverage.info");
