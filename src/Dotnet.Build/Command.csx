@@ -12,6 +12,8 @@ public static class Command
 
     public static async Task<CommandResult> CaptureAsync(string commandPath, string arguments, string workingDirectory = null)
     {
+        Error.WriteLine($"Executing command (AcptureAsync) {commandPath} {arguments} in working directory {workingDirectory}");
+
         var process = CreateProcess(commandPath, arguments, workingDirectory);
 
         var startProcessTask = StartProcessAsync(process, echo: false);
@@ -24,6 +26,7 @@ public static class Command
 
     public static async Task ExecuteAsync(string commandPath, string arguments, string workingDirectory = null, int success = 0)
     {
+        Error.WriteLine($"Executing command {commandPath} {arguments} in working directory {workingDirectory}");
         var process = CreateProcess(commandPath, arguments, workingDirectory);
         RedirectToConsole(process);
         var exitCode = await StartProcessAsync(process, echo: true);
