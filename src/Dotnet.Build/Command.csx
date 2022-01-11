@@ -12,7 +12,7 @@ public static class Command
 
     public static async Task<CommandResult> CaptureAsync(string commandPath, string arguments, string workingDirectory = null)
     {
-        Error.WriteLine($"Executing command (AcptureAsync) {commandPath} {arguments} in working directory {workingDirectory}");
+        Error.WriteLine($"Executing command (CaptureAsync) {commandPath} {arguments} in working directory {workingDirectory}");
 
         var process = CreateProcess(commandPath, arguments, workingDirectory);
 
