@@ -146,8 +146,20 @@ public static class DotNet
         {
             commitHash = $" /property:CommitHash={commitHash} ";
         }
+
         string pathToProjectFile = FindProjectFile(pathToProjectFolder);
-        Command.Execute("dotnet", $"pack {pathToProjectFile} --configuration Release --output {pathToPackageOutputFolder} {commitHash}");
+
+        var document = XDocument.Load(pathToProjectFile);
+        var version = document.Descendants("Version").SingleOrDefault()?.Value;
+        if (string.IsNullOrWhiteSpace(version))
+        {
+            version = BuildContext.LatestTag;
+        }
+
+        var versionProperty = $" /property:Version={version} ";
+
+
+        Command.Execute("dotnet", $"pack {pathToProjectFile} --configuration Release --output {pathToPackageOutputFolder} {commitHash} {versionProperty}");
     }
 
     public static void Push(string packagesFolder, string source = DefaultSource)
