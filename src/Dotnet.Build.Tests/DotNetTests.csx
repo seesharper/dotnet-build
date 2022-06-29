@@ -102,7 +102,7 @@ public class DotNetTests
     {
         using (var projectFolder = new DisposableFolder())
         {
-            Command.Execute("dotnet", $"new classlib -n TestLib -o {projectFolder.Path}");
+            Command.Execute("dotnet", $"new classlib -n TestLib -o {projectFolder.Path}", projectFolder.Path);
             DotNet.Pack(projectFolder.Path, projectFolder.Path);
 
             string pathToNugetFile = FindFile(projectFolder.Path, "*.nupkg");
@@ -115,7 +115,7 @@ public class DotNetTests
     {
         using (var projectFolder = new DisposableFolder())
         {
-            Command.Execute("dotnet", $"new classlib -n TestLib -o {projectFolder.Path}");
+            Command.Execute("dotnet", $"new classlib -n TestLib -o {projectFolder.Path}", projectFolder.Path);
 
 
             var projectFile = FindFile(projectFolder.Path, "*.csproj");

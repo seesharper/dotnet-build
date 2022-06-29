@@ -16,16 +16,11 @@ using static ScriptUnit;
 
 
 var testRunner = AddTestsFrom<CommandTests>()
+    .AddTestsFrom<BuildContextTests>()
     .AddTestsFrom<DotNetTests>()
     .AddTestsFrom<GitTests>()
     .AddTestsFrom<LoggerTests>()
     .AddTestsFrom<FileUtilsTests>()
     .AddTestsFrom<NuGetTests>()
-    .AddTestsFrom<InternalizerTests>()
-    .AddTestsFrom<BuildContextTests>();
-// if (BuildEnvironment.IsSecure)
-// {
-//     testRunner = testRunner.AddTestsFrom<ReleaseManagerTests>();
-// }
-
+    .AddTestsFrom<InternalizerTests>();
 return await testRunner.Execute();
