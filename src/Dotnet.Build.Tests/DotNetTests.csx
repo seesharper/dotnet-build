@@ -45,7 +45,7 @@ public class DotNetTests
         }
     }
 
-    [OnlyThis]
+    //[OnlyThis]
     public void ShouldAnalyzeCodeCoverageUsingCoverletAndReportGenerator()
     {
         using (var solutionFolder = new DisposableFolder())
@@ -97,7 +97,43 @@ public class DotNetTests
         }
     }
 
+    //[OnlyThis]
+    public void ShouldPackWithTagVersionWhenVersionAttributeIsMissing()
+    {
+        using (var projectFolder = new DisposableFolder())
+        {
+            Command.Execute("dotnet", $"new classlib -n TestLib -o {projectFolder.Path}", projectFolder.Path);
+            DotNet.Pack(projectFolder.Path, projectFolder.Path);
+
+            string pathToNugetFile = FindFile(projectFolder.Path, "*.nupkg");
+            Path.GetFileName(pathToNugetFile).Should().Be($"TestLib.{BuildContext.LatestTag}.nupkg");
+        }
+    }
+
     [OnlyThis]
+    public void ShouldPackWithVersionWhenVersionIsSpecified()
+    {
+        using (var projectFolder = new DisposableFolder())
+        {
+            Command.Execute("dotnet", $"new classlib -n TestLib -o {projectFolder.Path}", projectFolder.Path);
+
+
+            var projectFile = FindFile(projectFolder.Path, "*.csproj");
+            var document = XDocument.Load(projectFile);
+            var propertyGroupElement = document.Descendants("PropertyGroup").Single();
+            var isPublishableElement = new XElement("Version", "0.0.1");
+            propertyGroupElement.Add(isPublishableElement);
+            document.Save(projectFile);
+            DotNet.Pack(projectFolder.Path, projectFolder.Path);
+
+            string pathToNugetFile = FindFile(projectFolder.Path, "*.nupkg");
+
+
+            Path.GetFileName(pathToNugetFile).Should().Be($"TestLib.0.0.1.nupkg");
+        }
+    }
+
+    //[OnlyThis]
     public void ShouldPublishWhenProjectIsPublishable()
     {
         using (var solutionFolder = new DisposableFolder())
