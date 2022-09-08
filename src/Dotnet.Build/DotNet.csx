@@ -156,7 +156,7 @@ public static class DotNet
             version = BuildContext.LatestTag;
         }
 
-        var versionProperty = $" /property:Version={version} ";
+        var versionProperty = $" /property:Version={version.Replace("v", string.Empty, StringComparison.OrdinalIgnoreCase)} ";
 
 
         Command.Execute("dotnet", $"pack {pathToProjectFile} --configuration Release --output {pathToPackageOutputFolder} {commitHash} {versionProperty}");
