@@ -16,7 +16,6 @@ using System.Xml.Linq;
 
 public class DotNetTests
 {
-
     public void ShouldBuildProject()
     {
         using (var projectFolder = new DisposableFolder())

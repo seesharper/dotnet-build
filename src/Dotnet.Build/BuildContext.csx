@@ -105,7 +105,7 @@ public static class BuildContext
     private static bool IsTestProject(string pathToProjectFile)
     {
         var projectFile = XDocument.Load(pathToProjectFile);
-        var isTestProjectElement = projectFile.Descendants("IsTestProject").SingleOrDefault();
+        var isTestProjectElement = projectFile.Descendants("IsTestProject").FirstOrDefault();
         if (isTestProjectElement == null)
         {
             return pathToProjectFile.Contains("tests", StringComparison.OrdinalIgnoreCase);

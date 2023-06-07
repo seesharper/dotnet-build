@@ -11,7 +11,8 @@ using System.Xml.Linq;
 
 #pragma warning disable 1702
 
-//await AddTestsFrom<BuildContextTests>().AddFilter(m => m.IsDefined(typeof(OnlyThisAttribute), true)).Execute();
+// await AddTestsFrom<BuildContextTests>().Execute();
+// await AddTestsFrom<BuildContextTests>().AddFilter(m => m.IsDefined(typeof(OnlyThisAttribute), true)).Execute();
 public class BuildContextTests
 {
     public void ShouldGetOwnerAndProjectName()
@@ -56,6 +57,7 @@ public class BuildContextTests
     }
 
 
+    [OnlyThis]
     public void ShouldResolveTestableProjectsWhenProjectNameContainerIsTestProjectPropertySetToTrue()
     {
         using (var projectFolder = new DisposableFolder())
@@ -82,6 +84,7 @@ public class BuildContextTests
             var projectFilename = Path.Combine(srcDir, "Sample.xUnit", "Sample.xUnit.csproj");
             var projectFile = XDocument.Load(projectFilename);
             var propertyGroupElement = projectFile.Descendants("PropertyGroup").Single();
+            propertyGroupElement.Descendants("IsTestProject").Remove();
             propertyGroupElement.Add(new XElement("IsTestProject", false));
             projectFile.Save(projectFilename);
 
@@ -100,6 +103,7 @@ public class BuildContextTests
             var projectFilename = Path.Combine(srcDir, "Sample.xUnit.Tests", "Sample.xUnit.Tests.csproj");
             var projectFile = XDocument.Load(projectFilename);
             var propertyGroupElement = projectFile.Descendants("PropertyGroup").Single();
+            propertyGroupElement.Descendants("IsTestProject").Remove();
             propertyGroupElement.Add(new XElement("IsTestProject", false));
             projectFile.Save(projectFilename);
 
