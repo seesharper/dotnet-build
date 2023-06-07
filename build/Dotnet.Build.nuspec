@@ -1,9 +1,9 @@
-<?xml version="1.0"?>
+﻿<?xml version="1.0"?>
 <package >
   <metadata>
     <id>Dotnet.Build</id>
     <title>Dotnet.Build</title>
-    <version>0.16.1</version>
+    <version>0.17.0</version>
     <description>Just a collection of dotnet-script compatible scripts to be used in build scripts.</description>
     <authors>Bernhard Richter</authors>
     <owners>Bernhard Richter</owners>
@@ -16,7 +16,8 @@
       <dependency id="Microsoft.DotNet.PlatformAbstractions" version="2.0.3" />
       <dependency id="github-changelog" version="0.1.5" />
       <dependency id="NuGet.Packaging" version="5.6.0" />
-
+      <dependency id="CliWrap" version="3.6.3" />
+      <dependency id="Newtonsoft.Json" version="13.0.1" />
     </dependencies>
   </metadata>
 </package>

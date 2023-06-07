@@ -1,17 +1,50 @@
+#r "nuget: CliWrap, 3.6.3"
 #load "Command.csx"
 #load "FileUtils.csx"
 #load "CodeCoverageReportGenerator.csx"
 #load "BuildContext.csx"
-
+#load "Vulnerabilities.csx"
+#load "Outdated.csx"
 using System.Globalization;
 using System.Xml.Linq;
+using Newtonsoft.Json;
 using static FileUtils;
+
 
 public static class DotNet
 {
     private const string DefaultSource = "https://www.nuget.org/api/v2/package";
 
     private static string NuGetApiKey = System.Environment.GetEnvironmentVariable("NUGET_APIKEY");
+
+
+    public static async Task CheckPackageVulnerabilities(Func<VulnerabilityReport, bool> success = null)
+    {
+        success ??= report => report.Projects.All(p => p.Frameworks.All(f => f.TopLevelPackages.All(t => !t.Vulnerabilities.Any()))
+            && p.Frameworks.All(f => f.TransitivePackages.All(t => !t.Vulnerabilities.Any())));
+
+        var result = await Command.CaptureAsync("dotnet", "list package --vulnerable --include-transitive --format json", BuildContext.RepositoryFolder);
+        var report = JsonConvert.DeserializeObject<VulnerabilityReport>(result.StandardOut);
+
+        if (!success(report))
+        {
+            throw new InvalidOperationException("Package vulnerabilities found" + Environment.NewLine + result.StandardOut);
+        }
+    }
+
+    public static async Task CheckPackageVersions(Func<DependencyReport, bool> success = null)
+    {
+        success ??= report => report.Projects.All(p => p.Frameworks.All(f => f.TopLevelPackages.All(t => t.ResolvedVersion == t.LatestVersion)));
+
+        var result = await Command.CaptureAsync("dotnet", "list package --outdated --format json", BuildContext.RepositoryFolder);
+        var report = JsonConvert.DeserializeObject<DependencyReport>(result.StandardOut);
+
+        if (!success(report))
+        {
+            throw new InvalidOperationException("Package versions outdated" + Environment.NewLine + result.StandardOut);
+        }
+    }
+
 
     /// <summary>
     /// Executes the tests in the given path. The path may the full path to a csproj file
@@ -23,7 +56,17 @@ public static class DotNet
         string pathToProjectFile = FindProjectFile(path);
         if (pathToProjectFile.EndsWith("csproj", StringComparison.InvariantCultureIgnoreCase))
         {
-            Command.Execute("dotnet", "test " + pathToProjectFile + " --configuration Release");
+            var stdErrBuffer = new StringBuilder();
+            var result = CliWrap.Cli.Wrap("dotnet").WithArguments($"test {pathToProjectFile} --configuration Release")
+                .WithStandardErrorPipe(CliWrap.PipeTarget.ToStringBuilder(stdErrBuffer))
+                .WithStandardOutputPipe(CliWrap.PipeTarget.ToStream(Console.OpenStandardOutput()))
+                .WithValidation(CliWrap.CommandResultValidation.None)
+                .ExecuteAsync().GetAwaiter().GetResult();
+            if (result.ExitCode != 0)
+            {
+                Console.WriteLine(stdErrBuffer.ToString());
+                throw new InvalidOperationException($"The command dotnet test {BuildContext.RepositoryFolder} --configuration Release failed. {stdErrBuffer}");
+            }
             return;
         }
 
