@@ -18,12 +18,12 @@ public static class DotNet
     private static string NuGetApiKey = System.Environment.GetEnvironmentVariable("NUGET_APIKEY");
 
 
-    public static async Task CheckPackageVulnerabilities(Func<VulnerabilityReport, bool> success = null)
+    public static async Task CheckPackageVulnerabilities(Func<VulnerabilityReport, bool> success = null, string source = "https://api.nuget.org/v3/index.json")
     {
         success ??= report => report.Projects.All(p => p.Frameworks.All(f => f.TopLevelPackages.All(t => !t.Vulnerabilities.Any()))
             && p.Frameworks.All(f => f.TransitivePackages.All(t => !t.Vulnerabilities.Any())));
 
-        var result = await Command.CaptureAsync("dotnet", "list package --vulnerable --include-transitive --format json", BuildContext.RepositoryFolder);
+        var result = await Command.CaptureAsync("dotnet", $"list package --vulnerable --include-transitive --format json --source {source}", BuildContext.RepositoryFolder);
         var report = JsonConvert.DeserializeObject<VulnerabilityReport>(result.StandardOut);
 
         if (!success(report))
@@ -32,7 +32,7 @@ public static class DotNet
         }
     }
 
-    public static async Task CheckPackageVersions(Func<DependencyReport, bool> success = null)
+    public static async Task CheckPackageVersions(Func<DependencyReport, bool> success = null, string source = "https://api.nuget.org/v3/index.json")
     {
         success ??= report => report.Projects.All(p => p.Frameworks.All(f => f.TopLevelPackages.All(t => t.ResolvedVersion == t.LatestVersion)));
 
