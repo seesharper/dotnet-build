@@ -17,18 +17,32 @@ public static class DotNet
 
     private static string NuGetApiKey = System.Environment.GetEnvironmentVariable("NUGET_APIKEY");
 
-
-    public static async Task CheckPackageVulnerabilities(Func<VulnerabilityReport, bool> success = null, string source = "https://api.nuget.org/v3/index.json")
+    public static async Task CheckPackageVulnerabilities(string pathToProject, Func<VulnerabilityReport, bool> success = null, string source = "https://api.nuget.org/v3/index.json")
     {
         success ??= report => report.Projects.All(p => p.Frameworks.All(f => f.TopLevelPackages.All(t => !t.Vulnerabilities.Any()))
             && p.Frameworks.All(f => f.TransitivePackages.All(t => !t.Vulnerabilities.Any())));
-
-        var result = await Command.CaptureAsync("dotnet", $"list package --vulnerable --include-transitive --format json --source {source}", BuildContext.RepositoryFolder);
+        var result = await Command.CaptureAsync("dotnet", $"list {pathToProject} package --vulnerable --include-transitive --format json --source {source}", BuildContext.RepositoryFolder);
         var report = JsonConvert.DeserializeObject<VulnerabilityReport>(result.StandardOut);
 
         if (!success(report))
         {
             throw new InvalidOperationException("Package vulnerabilities found" + Environment.NewLine + result.StandardOut);
+        }
+    }
+
+
+    public static async Task CheckPackageVulnerabilities(Func<VulnerabilityReport, bool> success = null, string source = "https://api.nuget.org/v3/index.json", bool includeTestProjects = false)
+    {
+        foreach (var project in BuildContext.SourceProjects)
+        {
+            await CheckPackageVulnerabilities(project, success, source);
+        }
+        if (includeTestProjects)
+        {
+            foreach (var project in BuildContext.TestProjects)
+            {
+                await CheckPackageVulnerabilities(project, success, source);
+            }
         }
     }
 
