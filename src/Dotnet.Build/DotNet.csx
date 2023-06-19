@@ -21,6 +21,7 @@ public static class DotNet
     {
         success ??= report => report.Projects.All(p => p.Frameworks.All(f => f.TopLevelPackages.All(t => !t.Vulnerabilities.Any()))
             && p.Frameworks.All(f => f.TransitivePackages.All(t => !t.Vulnerabilities.Any())));
+        await Command.ExecuteAsync("dotnet", $"restore {pathToProject}", BuildContext.RepositoryFolder);
         var result = await Command.CaptureAsync("dotnet", $"list {pathToProject} package --vulnerable --include-transitive --format json --source {source}", BuildContext.RepositoryFolder);
         var report = JsonConvert.DeserializeObject<VulnerabilityReport>(result.StandardOut);
 
