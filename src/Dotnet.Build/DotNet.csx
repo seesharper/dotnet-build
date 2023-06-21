@@ -63,7 +63,7 @@ public static class DotNet
 
     /// <summary>
     /// Executes the tests in the given path. The path may the full path to a csproj file
-    /// that represents a test project or it may be the
+    /// that represents a test project or it may be the path to a csx file that contains tests
     /// </summary>
     /// <param name="path"></param>
     public static void Test(string path)
@@ -102,7 +102,7 @@ public static class DotNet
         var testprojects = BuildContext.TestProjects;
         foreach (var testProject in testprojects)
         {
-            Command.Execute("dotnet", "test " + testProject + " --configuration Release");
+            Test(testProject);
         }
     }
 
