@@ -50,7 +50,7 @@ public static class DotNet
     public static async Task CheckPackageVersions(Func<DependencyReport, bool> success = null, string source = "https://api.nuget.org/v3/index.json")
     {
         success ??= report => report.Projects.All(p => p.Frameworks.All(f => f.TopLevelPackages.All(t => t.ResolvedVersion == t.LatestVersion)));
-
+        await Command.ExecuteAsync("dotnet", $"restore {BuildContext.RepositoryFolder}", BuildContext.RepositoryFolder);
         var result = await Command.CaptureAsync("dotnet", "list package --outdated --format json", BuildContext.RepositoryFolder);
         var report = JsonConvert.DeserializeObject<DependencyReport>(result.StandardOut);
 
