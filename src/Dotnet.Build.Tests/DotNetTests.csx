@@ -10,7 +10,7 @@ using static ScriptUnit;
 using static FileUtils;
 using System.Xml.Linq;
 
-//await AddTestsFrom<DotNetTests>().AddFilter(m => m.IsDefined(typeof(OnlyThisAttribute), true)).Execute();
+//gst await AddTestsFrom<DotNetTests>().AddFilter(m => m.IsDefined(typeof(OnlyThisAttribute), true)).Execute();
 
 //await AddTestsFrom<DotNetTests>().Execute();
 
@@ -49,7 +49,6 @@ public class DotNetTests
     {
         using (var solutionFolder = new DisposableFolder())
         {
-            //Command.Execute("dotnet", "new sln");
             var srcFolder = CreateDirectory(solutionFolder.Path, "src");
             var buildFolder = CreateDirectory(solutionFolder.Path, "build");
             var artifactsFolder = CreateDirectory(buildFolder, "Artifacts");
@@ -59,6 +58,32 @@ public class DotNetTests
             Command.Execute("dotnet", $"new xunit", testFolder);
             Command.Execute("dotnet", "add package coverlet.collector", testFolder);
             Command.Execute("dotnet", "add reference ../SampleProject", testFolder);
+            DotNet.TestWithCodeCoverage(testFolder, artifactsFolder, 100);
+        }
+    }
+
+    //[OnlyThis]
+    public void ShouldReport100PercentCodeCoverageWithCodeAnnotatedWithGeneratedCodeAttribute()
+    {
+        using (var solutionFolder = new DisposableFolder())
+        {
+            var srcFolder = CreateDirectory(solutionFolder.Path, "src");
+            var buildFolder = CreateDirectory(solutionFolder.Path, "build");
+            var artifactsFolder = CreateDirectory(buildFolder, "Artifacts");
+            var projectFolder = CreateDirectory(srcFolder, "SampleProject");
+            var testFolder = CreateDirectory(srcFolder, "SampleProjects.Tests");
+            Command.Execute("dotnet", $"new classlib", projectFolder);
+            Command.Execute("dotnet", $"new xunit", testFolder);
+            Command.Execute("dotnet", "add package coverlet.collector", testFolder);
+            Command.Execute("dotnet", "add reference ../SampleProject", testFolder);
+            var sourceFile = File.CreateText(Path.Combine(projectFolder, "MyClass.cs"));
+            sourceFile.WriteLine("using System.CodeDom.Compiler;");
+            sourceFile.WriteLine("using System.Diagnostics.CodeAnalysis;");
+            sourceFile.WriteLine("[GeneratedCode(\"\", \"\")]");
+            sourceFile.WriteLine("public class MyClass { public void MyMethod() { Console.WriteLine(42);} }");
+            sourceFile.WriteLine("[ExcludeFromCodeCoverage]");
+            sourceFile.WriteLine("public class MyClass2 { public void MyMethod() { Console.WriteLine(42);} }");
+            sourceFile.Close();
             DotNet.TestWithCodeCoverage(testFolder, artifactsFolder, 100);
         }
     }
@@ -109,7 +134,7 @@ public class DotNetTests
         }
     }
 
-    [OnlyThis]
+    //[OnlyThis]
     public void ShouldPackWithVersionWhenVersionIsSpecified()
     {
         using (var projectFolder = new DisposableFolder())
