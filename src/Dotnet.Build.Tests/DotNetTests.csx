@@ -88,12 +88,52 @@ public class DotNetTests
         }
     }
 
+    public void ShouldReport100PercentCodeCoverageForSolutionWithCoverageSplitAcrossMultipleProjects()
+    {
+        using (var rootFolder = new DisposableFolder())
+        {
+            BuildContext.CodeCoverageThreshold = 100;
+            var srcFolder = CreateDirectory(rootFolder.Path, "src");
+            var buildFolder = CreateDirectory(rootFolder.Path, "build");
+            var artifactsFolder = CreateDirectory(buildFolder, "Artifacts");
+            var firstProjectFolder = CreateDirectory(srcFolder, "SampleProject1");
+            var secondProjectFolder = CreateDirectory(srcFolder, "SampleProject2");
+            var firstTestProjectFolder = CreateDirectory(srcFolder, "SampleProject1.Tests");
+            var secondTestProjectFolder = CreateDirectory(srcFolder, "SampleProject2.Tests");
+            Command.Execute("dotnet", "new classlib", firstProjectFolder);
+            Command.Execute("dotnet", "new classlib", secondProjectFolder);
+            Command.Execute("dotnet", "add reference ../SampleProject1", secondProjectFolder);
+            Command.Execute("dotnet", "new xunit", firstTestProjectFolder);
+            Command.Execute("dotnet", "add package coverlet.collector", firstTestProjectFolder);
+            Command.Execute("dotnet", "add reference ../SampleProject1", firstTestProjectFolder);
+            Command.Execute("dotnet", "new xunit", secondTestProjectFolder);
+            Command.Execute("dotnet", "add package coverlet.collector", secondTestProjectFolder);
+            Command.Execute("dotnet", "add reference ../SampleProject2", secondTestProjectFolder);
+            Command.Execute("dotnet", "new sln", srcFolder);
+            Command.Execute("dotnet", "sln add SampleProject1", srcFolder);
+            Command.Execute("dotnet", "sln add SampleProject2", srcFolder);
+            Command.Execute("dotnet", "sln add SampleProject1.Tests", srcFolder);
+            Command.Execute("dotnet", "sln add SampleProject2.Tests", srcFolder);
+            var templatesFolder = Path.Combine(GetScriptFolder(), "templates");
+            var firstSourceFilePath = Path.Combine(firstProjectFolder, "FirstTestableClass.cs");
+            Copy(Path.Combine(templatesFolder, "FirstTestableClass.template"), firstSourceFilePath);
+            var secondSourceFilePath = Path.Combine(secondProjectFolder, "SecondTestableClass.cs");
+            Copy(Path.Combine(templatesFolder, "SecondTestableClass.template"), secondSourceFilePath);
+            var firstTestSourceFilePath = Path.Combine(firstTestProjectFolder, "FirstTestableClassTests.cs");
+            Copy(Path.Combine(templatesFolder, "FirstTestableClassTests.template"), firstTestSourceFilePath);
+            var secondTestSourceFilePath = Path.Combine(secondTestProjectFolder, "SecondTestableClassTests.cs");
+            Copy(Path.Combine(templatesFolder, "SecondTestableClassTests.template"), secondTestSourceFilePath);
+
+            DotNet.TestSolutionWithCodeCoverage(Path.Combine(srcFolder, "src.sln"), artifactsFolder, 100);
+        }
+    }
+
     public void ShouldExecuteScriptTests()
     {
         using (var projectFolder = new DisposableFolder())
         {
             var pathToScriptUnitTests = Path.Combine(projectFolder.Path, "ScriptUnitTests.csx");
-            Copy(Path.Combine(GetScriptFolder(), "ScriptUnitTests.template"), pathToScriptUnitTests);
+            Copy(Path.Combine(GetScriptFolder(), "templates", "ScriptUnitTests.template"), pathToScriptUnitTests);
             DotNet.Test(pathToScriptUnitTests);
         }
     }

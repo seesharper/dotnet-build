@@ -1,0 +1,14 @@
+using Xunit;
+
+namespace FirstNamespace.Tests
+{
+    public class FirstTestableClassTests
+    {
+        [Fact]
+        public void MethodReturns42()
+        {
+            var firstClass = new FirstTestableClass();
+            Assert.Equal(42, firstClass.Method());
+        }
+    }
+}

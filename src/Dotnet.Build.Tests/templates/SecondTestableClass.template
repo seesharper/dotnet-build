@@ -1,0 +1,13 @@
+using FirstNamespace;
+
+namespace SecondNamespace
+{
+    public class SecondTestableClass
+    {
+        public string Method()
+        {
+            var firstClass = new FirstTestableClass();
+            return firstClass.OtherMethod();
+        }
+    }
+}

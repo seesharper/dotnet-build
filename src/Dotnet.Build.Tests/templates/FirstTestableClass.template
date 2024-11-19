@@ -1,0 +1,15 @@
+namespace FirstNamespace
+{
+    public class FirstTestableClass
+    {
+        public int Method()
+        {
+            return 42;
+        }
+
+        public string OtherMethod()
+        {
+            return "42";
+        }
+    }
+}

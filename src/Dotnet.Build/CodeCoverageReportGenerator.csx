@@ -13,7 +13,7 @@ public static class CodeCoverageReportGenerator
         var cliArguments = new Dictionary<string, string>();
         cliArguments.Add("reports", $"{pathToOpenCoverResult}");
         cliArguments.Add("targetdir", $"{codeCoverageArtifactsFolder}");
-        cliArguments.Add("reportTypes", "XmlSummary;Xml;HtmlInline_AzurePipelines_Dark");
+        cliArguments.Add("reportTypes", "Cobertura;XmlSummary;Xml;HtmlInline_AzurePipelines_Dark");
 
         var generator = new Generator();
         var settings = new Settings();

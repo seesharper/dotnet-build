@@ -49,7 +49,10 @@ public static class BuildContext
 
     public static string GitHubReleaseNotesPath => Path.Combine(GitHubArtifactsFolder, "ReleaseNotes.md");
 
+    public static string[] Solutions => FindSolutionFiles();
+
     public static string TestCoverageArtifactsFolder => testCoverageArtifactsFolder.Value;
+
     public static string[] TestProjects => FindProjectFiles().Where(IsTestProject).ToArray();
 
     public static string[] PackableProjects => SourceProjects.Where(IsPackable).ToArray();
@@ -92,6 +95,14 @@ public static class BuildContext
         return sourceFolder;
     }
 
+    private static string[] FindSolutionFiles()
+    {
+        var options = new EnumerationOptions();
+        options.MatchCasing = MatchCasing.CaseInsensitive;
+        options.RecurseSubdirectories = true;
+        var solutionFiles = Directory.GetFiles(SourceFolder, "*.sln", options);
+        return solutionFiles;
+    }
 
     private static string[] FindProjectFiles()
     {
@@ -159,4 +170,3 @@ public static class BuildContext
         return outputType.Equals("library", StringComparison.InvariantCultureIgnoreCase);
     }
 }
-

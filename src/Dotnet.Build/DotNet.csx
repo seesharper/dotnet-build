@@ -140,7 +140,7 @@ public static class DotNet
         FileUtils.RemoveDirectory(pathToFuckedUpTempFolder);
 
         var pathToCoberturaResults = Path.Combine(codeCoverageArtifactsFolder, "coverage.cobertura.xml");
-        CodeCoverageReportGenerator.Generate(pathToCoberturaResults, $"{codeCoverageArtifactsFolder}/Report");
+        CodeCoverageReportGenerator.Generate(pathToCoberturaResults, Path.Combine(codeCoverageArtifactsFolder, "Report"));
         CheckCoberturaCoverage(pathToCoberturaResults, threshold);
     }
 
@@ -186,6 +186,45 @@ public static class DotNet
             }
 
             return null;
+        }
+    }
+
+    public static void TestSolutionsWithCodeCoverage()
+    {
+        var solutions = BuildContext.Solutions;
+        foreach (var solution in solutions)
+        {
+            TestSolutionWithCodeCoverage(solution, BuildContext.ArtifactsFolder, BuildContext.CodeCoverageThreshold);
+        }
+    }
+
+    public static void TestSolutionWithCodeCoverage(string solution, string codeCoverageArtifactsFolder, int threshold)
+    {
+        var settingsFile = FindFile(Path.GetDirectoryName(solution), "coverlet.runsettings");
+        if (settingsFile == null)
+        {
+            Command.Execute("dotnet", $"test {solution} -c release --collect:\"XPlat Code Coverage\" --results-directory={codeCoverageArtifactsFolder} -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.ExcludeByAttribute=GeneratedCodeAttribute -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=lcov,cobertura", BuildContext.RepositoryFolder);
+        }
+        else
+        {
+            Error.WriteLine($"Found runsettings file at {settingsFile}");
+            Command.Execute("dotnet", $"test {solution} -c release --collect:\"XPlat Code Coverage\" --results-directory={codeCoverageArtifactsFolder} --settings {settingsFile}", BuildContext.RepositoryFolder);
+        }
+
+
+
+        var options = new EnumerationOptions();
+        options.MatchCasing = MatchCasing.CaseInsensitive;
+        options.RecurseSubdirectories = true;
+        var coberturaResultPaths = Directory.GetFiles(codeCoverageArtifactsFolder, "coverage.cobertura.xml", options);
+        var coberturaResults = string.Join(';', coberturaResultPaths);
+        var reportsPath = Path.Combine(codeCoverageArtifactsFolder, "Report");
+
+        CodeCoverageReportGenerator.Generate(coberturaResults, reportsPath);
+        CheckCoberturaCoverage(Path.Combine(reportsPath, "Cobertura.xml"), threshold);
+        foreach (var result in coberturaResultPaths)
+        {
+            RemoveDirectory(Path.GetDirectoryName(result));
         }
     }
 
