@@ -1,0 +1,14 @@
+using Xunit;
+
+namespace SecondNamespace.Tests
+{
+    public class SecondTestableClassTests
+    {
+        [Fact]
+        public void MethodReturns42AsString()
+        {
+            var secondClass = new SecondTestableClass();
+            Assert.Equal("42", secondClass.Method());
+        }
+    }
+}
