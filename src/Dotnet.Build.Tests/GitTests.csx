@@ -62,6 +62,60 @@ public class GitTests
         }
     }
 
+    public void ShouldGetLatestTagForCurrentCheckout()
+    {
+        using (var folder = new DisposableFolder())
+        {
+            var repo = folder.Init();
+            repo.Execute("commit --allow-empty -m \"First Commit\"");
+            repo.Execute("tag 1.0.0");
+            var firstCommitHash = repo.GetCurrentCommitHash();
+            repo.Execute("commit --allow-empty -m \"Second Commit\"");
+            repo.Execute("tag 2.0.0");
+            repo.Execute($"checkout {firstCommitHash}");
+            var latestTag = repo.GetLatestTag();
+            latestTag.Should().Be("1.0.0");
+        }
+    }
+
+    public void ShouldGetLatestTagHash()
+    {
+        using (var folder = new DisposableFolder())
+        {
+            var repo = folder.Init();
+            repo.Execute("commit --allow-empty -m \"First Commit\"");
+            repo.Execute("tag 1.0.0");
+            var latestTagHash = repo.GetLatestTagHash();
+            latestTagHash.Should().Be(repo.GetCurrentCommitHash());
+        }
+    }
+
+    public void ShouldReturnEmptyStringForLatestTagHash()
+    {
+        using (var folder = new DisposableFolder())
+        {
+            var repo = folder.Init();
+            repo.Execute("commit --allow-empty -m \"First Commit\"");
+            var latestTagHash = repo.GetLatestTagHash();
+            latestTagHash.Should().BeEmpty();
+        }
+    }
+
+    public void ShouldGetLatestTagHashFromCurrentCheckout()
+    {
+        using (var folder = new DisposableFolder())
+        {
+            var repo = folder.Init();
+            repo.Execute("commit --allow-empty -m \"First Commit\"");
+            repo.Execute("tag 1.0.0");
+            var firstCommitHash = repo.GetCurrentCommitHash();
+            repo.Execute("commit --allow-empty -m \"Second Commit\"");
+            repo.Execute("tag 2.0.0");
+            repo.Execute($"checkout {firstCommitHash}");
+            var latestTagHash = repo.GetLatestTagHash();
+            latestTagHash.Should().Be(firstCommitHash);
+        }
+    }
 
     public void ShouldDetectUntrackedFiles()
     {
@@ -118,4 +172,3 @@ public class GitTests
     }
 
 }
-
