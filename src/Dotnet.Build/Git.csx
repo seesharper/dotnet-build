@@ -60,7 +60,7 @@ public class GitRepository
 
     public string GetLatestTagHash()
     {
-        return Execute("rev-list --tags --max-count=1").StandardOut.RemoveNewLine();
+        return Execute($"rev-list --max-count=1 { GetLatestTag() }").StandardOut.RemoveNewLine();
     }
 
     public string GetUrlToPushOrigin()
