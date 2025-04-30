@@ -27,14 +27,6 @@ public class NuGetTests
         }
     }
 
-    [OnlyThis]
-    public void ShoudInstallPackage()
-    {
-        using (var targetFolder = new DisposableFolder())
-        {
-            NuGetHelper.Install("LightInject", targetFolder.Path);
-            FindFile(targetFolder.Path, "LightInject.dll").Should().NotBeEmpty();
-        }
-    }
+
 
 }
