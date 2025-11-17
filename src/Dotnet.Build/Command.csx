@@ -1,4 +1,4 @@
-#r "nuget:System.Diagnostics.Process, 4.3.0"
+
 using System.Diagnostics;
 using System.Threading;
 using System.Text.RegularExpressions;
@@ -7,7 +7,7 @@ public static class Command
 {
     public static CommandResult Capture(string commandPath, string arguments, string workingDirectory = null)
     {
-        return CaptureAsync(commandPath, arguments, workingDirectory).Result;
+        return CaptureAsync(commandPath, arguments, workingDirectory).GetAwaiter().GetResult();
     }
 
     public static async Task<CommandResult> CaptureAsync(string commandPath, string arguments, string workingDirectory = null)
@@ -16,12 +16,12 @@ public static class Command
 
         var process = CreateProcess(commandPath, arguments, workingDirectory);
 
-        var startProcessTask = StartProcessAsync(process, echo: false);
+        var startProcessTaskResult = await StartProcessAsync(process, echo: false);
         var readStandardOutputTask = process.StandardOutput.ReadToEndAsync();
         var readStandardErrorTask = process.StandardError.ReadToEndAsync();
 
-        await Task.WhenAll(startProcessTask, readStandardOutputTask, readStandardErrorTask).ConfigureAwait(false);
-        return new CommandResult(startProcessTask.Result, readStandardOutputTask.Result, readStandardErrorTask.Result);
+        await Task.WhenAll(readStandardOutputTask, readStandardErrorTask).ConfigureAwait(false);
+        return new CommandResult(startProcessTaskResult, readStandardOutputTask.Result, readStandardErrorTask.Result);
     }
 
     public static async Task ExecuteAsync(string commandPath, string arguments, string workingDirectory = null, int success = 0)
