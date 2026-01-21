@@ -100,8 +100,9 @@ public static class BuildContext
         var options = new EnumerationOptions();
         options.MatchCasing = MatchCasing.CaseInsensitive;
         options.RecurseSubdirectories = true;
-        var solutionFiles = Directory.GetFiles(SourceFolder, "*.sln", options);
-        return solutionFiles;
+        var slnFiles = Directory.GetFiles(SourceFolder, "*.sln", options);
+        var slnxFiles = Directory.GetFiles(SourceFolder, "*.slnx", options);
+        return slnFiles.Concat(slnxFiles).ToArray();
     }
 
     private static string[] FindProjectFiles()
