@@ -1,17 +1,17 @@
-#r "nuget: FluentAssertions, 5.6.0"
-#r "nuget:Octokit, 0.48.0"
+#r "nuget: AwesomeAssertions, 9.3.0"
+#r "nuget:Octokit, 14.0.0"
 #load "../Dotnet.Build/FileUtils.csx"
 #load "../Dotnet.Build/GitHub.csx"
 #load "../Dotnet.Build/GitHub-ReleaseManager.csx"
-#load "nuget:ScriptUnit, 0.1.3"
+#load "nuget:ScriptUnit, 0.2.0"
 #load "TestUtils.csx"
 
 using Octokit;
-using FluentAssertions;
+using AwesomeAssertions;
 using static ReleaseManagement;
 using static FileUtils;
 using static ScriptUnit;
-
+using DisposableFolder = FileUtils.DisposableFolder;
 //await AddTestsFrom<ReleaseManagerTests>().AddFilter(m => m.IsDefined(typeof(OnlyThisAttribute), true)).Execute();
 //await AddTestsFrom<ReleaseManagerTests>().Execute();
 

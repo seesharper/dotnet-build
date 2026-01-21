@@ -1,14 +1,14 @@
-#r "nuget: FluentAssertions, 5.6.0"
+#r "nuget: AwesomeAssertions, 9.3.0"
 #load "../Dotnet.Build/BuildContext.csx"
-#load "nuget:ScriptUnit, 0.1.3"
+#load "nuget:ScriptUnit, 0.2.0"
 #load "TestUtils.csx"
 #load "../Dotnet.Build/FileUtils.csx"
 
-using FluentAssertions;
+using AwesomeAssertions;
 using static ScriptUnit;
 using static FileUtils;
 using System.Xml.Linq;
-
+using DisposableFolder = FileUtils.DisposableFolder;
 #pragma warning disable 1702
 
 // await AddTestsFrom<BuildContextTests>().Execute();

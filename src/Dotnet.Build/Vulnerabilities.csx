@@ -1,4 +1,4 @@
-#r "nuget: Newtonsoft.Json, 13.0.1"
+#r "nuget: Newtonsoft.Json, 13.0.4"
 using Newtonsoft.Json;
 
 public class VulnerabilityReport

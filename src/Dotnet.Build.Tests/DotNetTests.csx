@@ -1,15 +1,15 @@
-#r "nuget: FluentAssertions, 5.6.0"
+#r "nuget: AwesomeAssertions, 9.3.0"
 #load "../Dotnet.Build/Command.csx"
 #load "../Dotnet.Build/DotNet.csx"
-#load "nuget:ScriptUnit, 0.1.3"
+#load "nuget:ScriptUnit, 0.2.0"
 #load "TestUtils.csx"
 
 
-using FluentAssertions;
+using AwesomeAssertions;
 using static ScriptUnit;
 using static FileUtils;
 using System.Xml.Linq;
-
+using DisposableFolder = FileUtils.DisposableFolder;
 //await AddTestsFrom<DotNetTests>().AddFilter(m => m.IsDefined(typeof(OnlyThisAttribute), true)).Execute();
 
 //await AddTestsFrom<DotNetTests>().Execute();
@@ -94,7 +94,7 @@ public class DotNetTests
             File.Delete(Path.Combine(projectFolder.Path, "UnitTest1.cs"));
             File.WriteAllText(Path.Combine(projectFolder.Path, "UnitTest1.cs"), content);
             var act = async () => await DotNet.TestAsync(projectFolder.Path, 1); ;
-            act.Should().Throw<TimeoutException>();
+            await act.Should().ThrowAsync<TimeoutException>();
 
         }
     }
@@ -182,7 +182,7 @@ public class DotNetTests
             File.Delete(Path.Combine(testFolder, "UnitTest1.cs"));
             File.WriteAllText(Path.Combine(testFolder, "UnitTest1.cs"), content);
             var act = async () => await DotNet.TestWithCodeCoverageAsync(testFolder, artifactsFolder, 100, null, 1);
-            act.Should().Throw<TimeoutException>();
+            await act.Should().ThrowAsync<TimeoutException>();
         }
     }
 

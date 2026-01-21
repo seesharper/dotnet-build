@@ -1,8 +1,8 @@
-#load "nuget:ScriptUnit, 0.1.3"
-#r "nuget:FluentAssertions, 4.19.4"
+#load "nuget:ScriptUnit, 0.2.0"
+#r "nuget:AwesomeAssertions, 9.3.0"
 
 using static ScriptUnit;   
-using FluentAssertions;
+using AwesomeAssertions;
 
 return await AddTestsFrom<SampleTests>().Execute();
 

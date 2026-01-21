@@ -1,4 +1,4 @@
-#r "nuget:Octokit, 0.48.0"
+#r "nuget:Octokit, 14.0.0"
 #load "FileUtils.csx"
 using Octokit;
 using static FileUtils;

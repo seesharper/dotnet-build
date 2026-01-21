@@ -1,5 +1,5 @@
-﻿<?xml version="1.0"?>
-<package >
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package>
   <metadata>
     <id>Dotnet.Build</id>
     <title>Dotnet.Build</title>
@@ -11,13 +11,13 @@
     <licenseUrl>https://opensource.org/licenses/MIT</licenseUrl>
     <tags>C# Build Scripting</tags>
     <dependencies>
-      <dependency id="Octokit" version="0.48.0" />
-      <dependency id="ReportGenerator.Core" version="4.3.0" />
-      <dependency id="Microsoft.DotNet.PlatformAbstractions" version="2.0.3" />
+      <dependency id="Octokit" version="14.0.0" />
+      <dependency id="ReportGenerator.Core" version="5.5.1" />
+      <dependency id="Microsoft.DotNet.PlatformAbstractions" version="3.1.6" />
       <dependency id="github-changelog" version="0.1.5" />
-      <dependency id="NuGet.Packaging" version="5.6.0" />
-      <dependency id="CliWrap" version="3.6.3" />
-      <dependency id="Newtonsoft.Json" version="13.0.1" />
+      <dependency id="NuGet.Packaging" version="7.0.1" />
+      <dependency id="CliWrap" version="3.10.0" />
+      <dependency id="Newtonsoft.Json" version="13.0.4" />
     </dependencies>
   </metadata>
 </package>

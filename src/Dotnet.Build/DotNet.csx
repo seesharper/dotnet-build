@@ -1,4 +1,4 @@
-#r "nuget: CliWrap, 3.6.3"
+#r "nuget: CliWrap, 3.10.0"
 #load "Command.csx"
 #load "FileUtils.csx"
 #load "CodeCoverageReportGenerator.csx"

@@ -1,9 +1,9 @@
-#r "nuget: FluentAssertions, 5.6.0"
+#r "nuget: AwesomeAssertions, 9.3.0"
 #load "../Dotnet.Build/Command.csx"
-#load "nuget:ScriptUnit, 0.1.3"
+#load "nuget:ScriptUnit, 0.2.0"
 #load "TestUtils.csx"
 
-using FluentAssertions;
+using AwesomeAssertions;
 using static ScriptUnit;
 
 //await AddTestsFrom<CommandTests>().AddFilter(m => m.IsDefined(typeof(OnlyThisAttribute), true)).Execute();
