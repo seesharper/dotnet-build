@@ -1,6 +1,6 @@
 #r "nuget: AwesomeAssertions, 9.3.0"
 #load "../Dotnet.Build/Logger.csx"
-#load "nuget:ScriptUnit, 0.2.0"
+#load "nuget:ScriptUnit, 0.1.3"
 
 using AwesomeAssertions;
 using static ScriptUnit;

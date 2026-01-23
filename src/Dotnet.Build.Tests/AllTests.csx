@@ -9,7 +9,7 @@
 #load "../Dotnet.Build.Tests/GitHub-ReleaseManagerTests.csx"
 #load "../Dotnet.Build/BuildEnvironment.csx"
 
-#load "nuget:ScriptUnit, 0.2.0"
+#load "nuget:ScriptUnit, 0.1.3"
 
 using static ScriptUnit;
 
