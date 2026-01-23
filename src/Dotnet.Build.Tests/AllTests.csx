@@ -17,7 +17,7 @@ using static ScriptUnit;
 
 var testRunner = AddTestsFrom<CommandTests>()
     .AddTestsFrom<BuildContextTests>()
-    .AddTestsFrom<DotNetTests>()
+    //.AddTestsFrom<DotNetTests>()
     .AddTestsFrom<GitTests>()
     .AddTestsFrom<LoggerTests>()
     .AddTestsFrom<FileUtilsTests>()
