@@ -95,7 +95,7 @@ public static class DotNet
         throw new InvalidOperationException($"No tests found at the path {path}");
     }
 
-    public static async Task TestAsync(string path, int timeoutInSeconds = 30)
+    public static async Task TestAsync(string path, int timeoutInSeconds = 1800)
     {
         var cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(timeoutInSeconds));
         string pathToProjectFile = FindProjectFile(path);
@@ -148,12 +148,12 @@ public static class DotNet
     /// <summary>
     /// Executes all test projects found in <see cref="BuildContext.TestProjects"/>.
     /// </summary>
-    public static async Task TestAsync(int timeoutInMinutes = 30)
+    public static async Task TestAsync(int timeoutInSeconds = 1800)
     {
         var testprojects = BuildContext.TestProjects;
         foreach (var testProject in testprojects)
         {
-            await TestAsync(testProject, timeoutInMinutes);
+            await TestAsync(testProject, timeoutInSeconds);
         }
     }
 
@@ -201,7 +201,7 @@ public static class DotNet
     /// </summary>
     /// <param name="pathToProjectFolder"></param>
     /// <param name="codeCoverageArtifactsFolder"></param>
-    public static async Task TestWithCodeCoverageAsync(string pathToTestProjectFolder, string codeCoverageArtifactsFolder, int threshold = 100, string targetFramework = null, int timeoutInSeconds = 60)
+    public static async Task TestWithCodeCoverageAsync(string pathToTestProjectFolder, string codeCoverageArtifactsFolder, int threshold = 100, string targetFramework = null, int timeoutInSeconds = 1800)
     {
         var cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(timeoutInSeconds));
 
@@ -326,7 +326,7 @@ public static class DotNet
         if (settingsFile == null)
         {
             var res = Command.Capture("dotnet", $"test {solution} -c release --collect:\"XPlat Code Coverage\" --results-directory={codeCoverageArtifactsFolder} -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.ExcludeByAttribute=GeneratedCodeAttribute -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=lcov,cobertura", BuildContext.RepositoryFolder);
-            
+
             Command.Execute("dotnet", $"test {solution} -c release --collect:\"XPlat Code Coverage\" --results-directory={codeCoverageArtifactsFolder} -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.ExcludeByAttribute=GeneratedCodeAttribute -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=lcov,cobertura", BuildContext.RepositoryFolder);
         }
         else
