@@ -325,8 +325,6 @@ public static class DotNet
         var settingsFile = FindFile(Path.GetDirectoryName(solution), "coverlet.runsettings");
         if (settingsFile == null)
         {
-            var res = Command.Capture("dotnet", $"test {solution} -c release --collect:\"XPlat Code Coverage\" --results-directory={codeCoverageArtifactsFolder} -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.ExcludeByAttribute=GeneratedCodeAttribute -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=lcov,cobertura", BuildContext.RepositoryFolder);
-
             Command.Execute("dotnet", $"test {solution} -c release --collect:\"XPlat Code Coverage\" --results-directory={codeCoverageArtifactsFolder} -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.ExcludeByAttribute=GeneratedCodeAttribute -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=lcov,cobertura", BuildContext.RepositoryFolder);
         }
         else
