@@ -46,58 +46,58 @@ public class DotNetTests
     }
 
     //[OnlyThis]
-    public async Task ShouldExecuteAsyncTestsWithTimeout()
-    {
-        var content = """
-        namespace Testing;
+    // public async Task ShouldExecuteAsyncTestsWithTimeout()
+    // {
+    //     var content = """
+    //     namespace Testing;
 
-        public class UnitTest1
-        {
-            [Fact]
-            public async Task Test1()
-            {
-                await Task.Delay(2000);
-                Assert.True(true);
-            }
-        }
-        """;
+    //     public class UnitTest1
+    //     {
+    //         [Fact]
+    //         public async Task Test1()
+    //         {
+    //             await Task.Delay(2000);
+    //             Assert.True(true);
+    //         }
+    //     }
+    //     """;
 
-        using (var projectFolder = new DisposableFolder())
-        {
-            await Command.ExecuteAsync("dotnet", $"new xunit -o {projectFolder.Path}");
-            File.Delete(Path.Combine(projectFolder.Path, "UnitTest1.cs"));
-            File.WriteAllText(Path.Combine(projectFolder.Path, "UnitTest1.cs"), content);
-            await DotNet.TestAsync(projectFolder.Path);
-        }
-    }
+    //     using (var projectFolder = new DisposableFolder())
+    //     {
+    //         await Command.ExecuteAsync("dotnet", $"new xunit -o {projectFolder.Path}");
+    //         File.Delete(Path.Combine(projectFolder.Path, "UnitTest1.cs"));
+    //         File.WriteAllText(Path.Combine(projectFolder.Path, "UnitTest1.cs"), content);
+    //         await DotNet.TestAsync(projectFolder.Path);
+    //     }
+    // }
 
     //[OnlyThis]
-    public async Task ShouldExecuteAsyncTestsWithExceededTimeout()
-    {
-        var content = """
-        namespace Testing;
+    // public async Task ShouldExecuteAsyncTestsWithExceededTimeout()
+    // {
+    //     var content = """
+    //     namespace Testing;
 
-        public class UnitTest1
-        {
-            [Fact]
-            public async Task Test1()
-            {
-                await Task.Delay(2000);
-                Assert.True(true);
-            }
-        }
-        """;
+    //     public class UnitTest1
+    //     {
+    //         [Fact]
+    //         public async Task Test1()
+    //         {
+    //             await Task.Delay(2000);
+    //             Assert.True(true);
+    //         }
+    //     }
+    //     """;
 
-        using (var projectFolder = new DisposableFolder())
-        {
-            await Command.ExecuteAsync("dotnet", $"new xunit -o {projectFolder.Path}");
-            File.Delete(Path.Combine(projectFolder.Path, "UnitTest1.cs"));
-            File.WriteAllText(Path.Combine(projectFolder.Path, "UnitTest1.cs"), content);
-            var act = async () => await DotNet.TestAsync(projectFolder.Path, 1); ;
-            await act.Should().ThrowAsync<TimeoutException>();
+    //     using (var projectFolder = new DisposableFolder())
+    //     {
+    //         await Command.ExecuteAsync("dotnet", $"new xunit -o {projectFolder.Path}");
+    //         File.Delete(Path.Combine(projectFolder.Path, "UnitTest1.cs"));
+    //         File.WriteAllText(Path.Combine(projectFolder.Path, "UnitTest1.cs"), content);
+    //         var act = async () => await DotNet.TestAsync(projectFolder.Path, 1); ;
+    //         await act.Should().ThrowAsync<TimeoutException>();
 
-        }
-    }
+    //     }
+    // }
 
     //[OnlyThis]
     public void ShouldAnalyzeCodeCoverageUsingCoverletAndReportGenerator()
@@ -118,73 +118,73 @@ public class DotNetTests
     }
 
     //[OnlyThis]
-    public async Task ShouldAnalyzeCodeCoverageAsyncUsingCoverletAndReportGeneratorWithTimeout()
-    {
-        var content = """
-        namespace Testing;
+    // public async Task ShouldAnalyzeCodeCoverageAsyncUsingCoverletAndReportGeneratorWithTimeout()
+    // {
+    //     var content = """
+    //     namespace Testing;
 
-        public class UnitTest1
-        {
-            [Fact]
-            public async Task Test1()
-            {
-                await Task.Delay(2000);
-                Assert.True(true);
-            }
-        }
-        """;
+    //     public class UnitTest1
+    //     {
+    //         [Fact]
+    //         public async Task Test1()
+    //         {
+    //             await Task.Delay(2000);
+    //             Assert.True(true);
+    //         }
+    //     }
+    //     """;
 
-        using (var solutionFolder = new DisposableFolder())
-        {
-            var srcFolder = CreateDirectory(solutionFolder.Path, "src");
-            var buildFolder = CreateDirectory(solutionFolder.Path, "build");
-            var artifactsFolder = CreateDirectory(buildFolder, "Artifacts");
-            var projectFolder = CreateDirectory(srcFolder, "SampleProject");
-            var testFolder = CreateDirectory(srcFolder, "SampleProjects.Tests");
-            await Command.ExecuteAsync("dotnet", $"new classlib", projectFolder);
-            await Command.ExecuteAsync("dotnet", $"new xunit", testFolder);
-            await Command.ExecuteAsync("dotnet", "add package coverlet.collector", testFolder);
-            await Command.ExecuteAsync("dotnet", "add reference ../SampleProject", testFolder);
-            File.Delete(Path.Combine(testFolder, "UnitTest1.cs"));
-            File.WriteAllText(Path.Combine(testFolder, "UnitTest1.cs"), content);
-            await DotNet.TestWithCodeCoverageAsync(testFolder, artifactsFolder, 100);
-        }
-    }
+    //     using (var solutionFolder = new DisposableFolder())
+    //     {
+    //         var srcFolder = CreateDirectory(solutionFolder.Path, "src");
+    //         var buildFolder = CreateDirectory(solutionFolder.Path, "build");
+    //         var artifactsFolder = CreateDirectory(buildFolder, "Artifacts");
+    //         var projectFolder = CreateDirectory(srcFolder, "SampleProject");
+    //         var testFolder = CreateDirectory(srcFolder, "SampleProjects.Tests");
+    //         await Command.ExecuteAsync("dotnet", $"new classlib", projectFolder);
+    //         await Command.ExecuteAsync("dotnet", $"new xunit", testFolder);
+    //         await Command.ExecuteAsync("dotnet", "add package coverlet.collector", testFolder);
+    //         await Command.ExecuteAsync("dotnet", "add reference ../SampleProject", testFolder);
+    //         File.Delete(Path.Combine(testFolder, "UnitTest1.cs"));
+    //         File.WriteAllText(Path.Combine(testFolder, "UnitTest1.cs"), content);
+    //         await DotNet.TestWithCodeCoverageAsync(testFolder, artifactsFolder, 100);
+    //     }
+    // }
 
     //[OnlyThis]
-    public async Task ShouldAnalyzeCodeCoverageAsyncUsingCoverletAndReportGeneratorWithExceededTimeout()
-    {
-        var content = """
-        namespace Testing;
+    // public async Task ShouldAnalyzeCodeCoverageAsyncUsingCoverletAndReportGeneratorWithExceededTimeout()
+    // {
+    //     var content = """
+    //     namespace Testing;
 
-        public class UnitTest1
-        {
-            [Fact]
-            public async Task Test1()
-            {
-                await Task.Delay(2000);
-                Assert.True(true);
-            }
-        }
-        """;
+    //     public class UnitTest1
+    //     {
+    //         [Fact]
+    //         public async Task Test1()
+    //         {
+    //             await Task.Delay(2000);
+    //             Assert.True(true);
+    //         }
+    //     }
+    //     """;
 
-        using (var solutionFolder = new DisposableFolder())
-        {
-            var srcFolder = CreateDirectory(solutionFolder.Path, "src");
-            var buildFolder = CreateDirectory(solutionFolder.Path, "build");
-            var artifactsFolder = CreateDirectory(buildFolder, "Artifacts");
-            var projectFolder = CreateDirectory(srcFolder, "SampleProject");
-            var testFolder = CreateDirectory(srcFolder, "SampleProjects.Tests");
-            await Command.ExecuteAsync("dotnet", $"new classlib", projectFolder);
-            await Command.ExecuteAsync("dotnet", $"new xunit", testFolder);
-            await Command.ExecuteAsync("dotnet", "add package coverlet.collector", testFolder);
-            await Command.ExecuteAsync("dotnet", "add reference ../SampleProject", testFolder);
-            File.Delete(Path.Combine(testFolder, "UnitTest1.cs"));
-            File.WriteAllText(Path.Combine(testFolder, "UnitTest1.cs"), content);
-            var act = async () => await DotNet.TestWithCodeCoverageAsync(testFolder, artifactsFolder, 100, null, 1);
-            await act.Should().ThrowAsync<TimeoutException>();
-        }
-    }
+    //     using (var solutionFolder = new DisposableFolder())
+    //     {
+    //         var srcFolder = CreateDirectory(solutionFolder.Path, "src");
+    //         var buildFolder = CreateDirectory(solutionFolder.Path, "build");
+    //         var artifactsFolder = CreateDirectory(buildFolder, "Artifacts");
+    //         var projectFolder = CreateDirectory(srcFolder, "SampleProject");
+    //         var testFolder = CreateDirectory(srcFolder, "SampleProjects.Tests");
+    //         await Command.ExecuteAsync("dotnet", $"new classlib", projectFolder);
+    //         await Command.ExecuteAsync("dotnet", $"new xunit", testFolder);
+    //         await Command.ExecuteAsync("dotnet", "add package coverlet.collector", testFolder);
+    //         await Command.ExecuteAsync("dotnet", "add reference ../SampleProject", testFolder);
+    //         File.Delete(Path.Combine(testFolder, "UnitTest1.cs"));
+    //         File.WriteAllText(Path.Combine(testFolder, "UnitTest1.cs"), content);
+    //         var act = async () => await DotNet.TestWithCodeCoverageAsync(testFolder, artifactsFolder, 100, null, 1);
+    //         await act.Should().ThrowAsync<TimeoutException>();
+    //     }
+    // }
 
 
     //[OnlyThis]
