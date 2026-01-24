@@ -13,8 +13,6 @@
 
 using static ScriptUnit;
 
-
-
 var testRunner = AddTestsFrom<CommandTests>()
     .AddTestsFrom<BuildContextTests>()
     .AddTestsFrom<DotNetTests>()
