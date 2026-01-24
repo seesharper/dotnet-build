@@ -3,7 +3,7 @@
 #load "../Dotnet.Build/Command.csx"
 #load "../Dotnet.Build/FileUtils.csx"
 #load "TestUtils.csx"
-#load "nuget:ScriptUnit, 0.1.3"
+#load "nuget:ScriptUnit, 0.2.0"
 
 
 using AwesomeAssertions;

@@ -4,7 +4,7 @@
 #load "../Dotnet.Build/DotNet.csx"
 #load "../Dotnet.Build/FileUtils.csx"
 
-#load "nuget:ScriptUnit, 0.1.3"
+#load "nuget:ScriptUnit, 0.2.0"
 #load "TestUtils.csx"
 
 using static ScriptUnit;
