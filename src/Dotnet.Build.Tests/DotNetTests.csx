@@ -72,32 +72,32 @@ public class DotNetTests
     }
 
     // [OnlyThis]
-    // public async Task ShouldExecuteAsyncTestsWithExceededTimeout()
-    // {
-    //     var content = """
-    //     namespace Testing;
+    public async Task ShouldExecuteAsyncTestsWithExceededTimeout()
+    {
+        var content = """
+        namespace Testing;
 
-    //     public class UnitTest1
-    //     {
-    //         [Fact]
-    //         public async Task Test1()
-    //         {
-    //             await Task.Delay(2000);
-    //             Assert.True(true);
-    //         }
-    //     }
-    //     """;
+        public class UnitTest1
+        {
+            [Fact]
+            public async Task Test1()
+            {
+                await Task.Delay(2000);
+                Assert.True(true);
+            }
+        }
+        """;
 
-    //     using (var projectFolder = new DisposableFolder())
-    //     {
-    //         await Command.ExecuteAsync("dotnet", $"new xunit -o {projectFolder.Path}");
-    //         File.Delete(Path.Combine(projectFolder.Path, "UnitTest1.cs"));
-    //         File.WriteAllText(Path.Combine(projectFolder.Path, "UnitTest1.cs"), content);
-    //         var act = async () => await DotNet.TestAsync(projectFolder.Path, 1); ;
-    //         await act.Should().ThrowAsync<TimeoutException>();
+        using (var projectFolder = new DisposableFolder())
+        {
+            await Command.ExecuteAsync("dotnet", $"new xunit -o {projectFolder.Path}");
+            File.Delete(Path.Combine(projectFolder.Path, "UnitTest1.cs"));
+            File.WriteAllText(Path.Combine(projectFolder.Path, "UnitTest1.cs"), content);
+            var act = async () => await DotNet.TestAsync(projectFolder.Path, 1); ;
+            await act.Should().ThrowAsync<TimeoutException>();
 
-    //     }
-    // }
+        }
+    }
 
     //[OnlyThis]
     // public void ShouldAnalyzeCodeCoverageUsingCoverletAndReportGenerator()
