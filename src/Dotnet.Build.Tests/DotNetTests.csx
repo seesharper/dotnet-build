@@ -10,9 +10,9 @@ using static ScriptUnit;
 using static FileUtils;
 using System.Xml.Linq;
 using DisposableFolder = FileUtils.DisposableFolder;
-//await AddTestsFrom<DotNetTests>().AddFilter(m => m.IsDefined(typeof(OnlyThisAttribute), true)).Execute();
+await AddTestsFrom<DotNetTests>().AddFilter(m => m.IsDefined(typeof(OnlyThisAttribute), true)).Execute();
 
-await AddTestsFrom<DotNetTests>().Execute();
+//await AddTestsFrom<DotNetTests>().Execute();
 
 public class DotNetTests
 {
@@ -99,7 +99,7 @@ public class DotNetTests
         }
     }
 
-    //[OnlyThis]
+    [OnlyThis]
     public void ShouldAnalyzeCodeCoverageUsingCoverletAndReportGenerator()
     {
         using (var solutionFolder = new DisposableFolder())
@@ -111,9 +111,8 @@ public class DotNetTests
             var testFolder = CreateDirectory(srcFolder, "SampleProjects.Tests");
             Command.Execute("dotnet", $"new classlib", projectFolder);
             Command.Execute("dotnet", $"new xunit", testFolder);
-            Command.Execute("dotnet", "add package coverlet.collector", testFolder);
-            // Command.Execute("dotnet", "add reference ../SampleProject", testFolder);
-            // DotNet.TestWithCodeCoverage(testFolder, artifactsFolder, 100);
+            Command.Execute("dotnet", "add reference ../SampleProject", testFolder);
+            DotNet.TestWithCodeCoverage(testFolder, artifactsFolder, 100);
         }
     }
 
