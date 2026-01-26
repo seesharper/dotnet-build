@@ -1,15 +1,16 @@
-﻿#r "nuget: FluentAssertions, 5.6.0"
+#r "nuget: AwesomeAssertions, 9.3.0"
 #load "../Dotnet.Build/Command.csx"
 #load "../Dotnet.Build/NuGet.csx"
 #load "../Dotnet.Build/DotNet.csx"
 #load "../Dotnet.Build/FileUtils.csx"
 
-#load "nuget:ScriptUnit, 0.1.3"
+#load "nuget:ScriptUnit, 0.2.0"
 #load "TestUtils.csx"
 
 using static ScriptUnit;
 using static FileUtils;
-using FluentAssertions;
+using AwesomeAssertions;
+using DisposableFolder = FileUtils.DisposableFolder;
 
 
 //return await AddTestsFrom<NuGetTests>().Execute();

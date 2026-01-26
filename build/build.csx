@@ -1,4 +1,4 @@
-#r "nuget:Octokit, 0.48.0"
+#r "nuget:Octokit, 14.0.0"
 #load "nuget:github-changelog, 0.1.5"
 #load "../src/Dotnet.Build/Command.csx"
 #load "../src/Dotnet.Build/DotNet.csx"

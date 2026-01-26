@@ -1,14 +1,15 @@
-#r "nuget: FluentAssertions, 5.6.0"
+#r "nuget: AwesomeAssertions, 9.3.0"
 #load "../Dotnet.Build/Git.csx"
 #load "../Dotnet.Build/Command.csx"
 #load "../Dotnet.Build/FileUtils.csx"
 #load "TestUtils.csx"
-#load "nuget:ScriptUnit, 0.1.3"
+#load "nuget:ScriptUnit, 0.2.0"
 
 
-using FluentAssertions;
+using AwesomeAssertions;
 using static ScriptUnit;
 using static FileUtils;
+using DisposableFolder = FileUtils.DisposableFolder;
 //await AddTestsFrom<GitTests>().Execute();
 //await AddTestsFrom<GitTests>().AddFilter(m => m.IsDefined(typeof(OnlyThisAttribute), true)).Execute();
 

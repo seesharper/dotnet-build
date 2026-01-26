@@ -9,11 +9,9 @@
 #load "../Dotnet.Build.Tests/GitHub-ReleaseManagerTests.csx"
 #load "../Dotnet.Build/BuildEnvironment.csx"
 
-#load "nuget:ScriptUnit, 0.1.3"
+#load "nuget:ScriptUnit, 0.2.0"
 
 using static ScriptUnit;
-
-
 
 var testRunner = AddTestsFrom<CommandTests>()
     .AddTestsFrom<BuildContextTests>()

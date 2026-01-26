@@ -1,4 +1,4 @@
-#r "nuget: CliWrap, 3.6.3"
+#r "nuget: CliWrap, 3.10.0"
 #load "Command.csx"
 #load "FileUtils.csx"
 #load "CodeCoverageReportGenerator.csx"
@@ -6,6 +6,7 @@
 #load "Vulnerabilities.csx"
 #load "Outdated.csx"
 using System.Globalization;
+using System.Threading;
 using System.Xml.Linq;
 using Newtonsoft.Json;
 using static FileUtils;
@@ -94,6 +95,44 @@ public static class DotNet
         throw new InvalidOperationException($"No tests found at the path {path}");
     }
 
+    public static async Task TestAsync(string path, int timeoutInSeconds = 1800)
+    {
+        var cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(timeoutInSeconds));
+        string pathToProjectFile = FindProjectFile(path);
+        if (pathToProjectFile.EndsWith("csproj", StringComparison.InvariantCultureIgnoreCase))
+        {
+            var stdErrBuffer = new StringBuilder();
+            try
+            {
+                var result = await CliWrap.Cli.Wrap("dotnet").WithArguments($"test {pathToProjectFile} --configuration Release")
+                .WithStandardErrorPipe(CliWrap.PipeTarget.ToStringBuilder(stdErrBuffer))
+                .WithStandardOutputPipe(CliWrap.PipeTarget.ToStream(Console.OpenStandardOutput()))
+                .WithValidation(CliWrap.CommandResultValidation.None)
+                .ExecuteAsync(cancellationTokenSource.Token);
+                if (result.ExitCode != 0)
+                {
+                    Console.WriteLine(stdErrBuffer.ToString());
+                    throw new InvalidOperationException($"The command dotnet test {BuildContext.RepositoryFolder} --configuration Release failed. {stdErrBuffer}");
+                }
+                return;
+            }
+            catch (OperationCanceledException)
+            {
+                throw new TimeoutException($"The command dotnet test {BuildContext.RepositoryFolder} --configuration Release timed out after {timeoutInSeconds} seconds.");
+            }
+
+        }
+
+        if (pathToProjectFile.EndsWith("csx", StringComparison.InvariantCultureIgnoreCase))
+        {
+            await Command.ExecuteAsync("dotnet", $"script {path}");
+            return;
+        }
+
+        throw new InvalidOperationException($"No tests found at the path {path}");
+    }
+
+
     /// <summary>
     /// Executes all test projects found in <see cref="BuildContext.TestProjects"/>.
     /// </summary>
@@ -105,6 +144,19 @@ public static class DotNet
             Test(testProject);
         }
     }
+
+    /// <summary>
+    /// Executes all test projects found in <see cref="BuildContext.TestProjects"/>.
+    /// </summary>
+    public static async Task TestAsync(int timeoutInSeconds = 1800)
+    {
+        var testprojects = BuildContext.TestProjects;
+        foreach (var testProject in testprojects)
+        {
+            await TestAsync(testProject, timeoutInSeconds);
+        }
+    }
+
 
     /// <summary>
     /// Executes the tests with code coverage.
@@ -143,6 +195,76 @@ public static class DotNet
         CodeCoverageReportGenerator.Generate(pathToCoberturaResults, Path.Combine(codeCoverageArtifactsFolder, "Report"));
         CheckCoberturaCoverage(pathToCoberturaResults, threshold);
     }
+
+    /// <summary>
+    /// Executes the tests with code coverage.
+    /// </summary>
+    /// <param name="pathToProjectFolder"></param>
+    /// <param name="codeCoverageArtifactsFolder"></param>
+    public static async Task TestWithCodeCoverageAsync(string pathToTestProjectFolder, string codeCoverageArtifactsFolder, int threshold = 100, string targetFramework = null, int timeoutInSeconds = 1800)
+    {
+        var cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(timeoutInSeconds));
+
+        if (!string.IsNullOrWhiteSpace(targetFramework))
+        {
+            targetFramework = $" -f {targetFramework} ";
+        }
+
+        var settingsFile = FindFile(pathToTestProjectFolder, "coverlet.runsettings");
+        var stdErrBuffer = new StringBuilder();
+
+        try
+        {
+            if (settingsFile == null)
+            {
+                var args = $"test -c release {targetFramework} --collect:\"XPlat Code Coverage\" --results-directory={codeCoverageArtifactsFolder} -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.ExcludeByAttribute=GeneratedCodeAttribute -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=lcov,cobertura";
+                var result = await CliWrap.Cli.Wrap("dotnet").WithArguments(args)
+                    .WithWorkingDirectory(pathToTestProjectFolder)
+                    .WithStandardErrorPipe(CliWrap.PipeTarget.ToStringBuilder(stdErrBuffer))
+                    .WithStandardOutputPipe(CliWrap.PipeTarget.ToStream(Console.OpenStandardOutput()))
+                    .WithValidation(CliWrap.CommandResultValidation.None)
+                    .ExecuteAsync(cancellationTokenSource.Token);
+                if (result.ExitCode != 0)
+                {
+                    Console.WriteLine(stdErrBuffer.ToString());
+                    throw new InvalidOperationException($"The command dotnet test failed. {stdErrBuffer}");
+                }
+            }
+            else
+            {
+                Error.WriteLine($"Found runsettings file at {settingsFile}");
+                var args = $"test -c release {targetFramework} --collect:\"XPlat Code Coverage\" --results-directory={codeCoverageArtifactsFolder} --settings {settingsFile}";
+                var result = await CliWrap.Cli.Wrap("dotnet").WithArguments(args)
+                    .WithWorkingDirectory(pathToTestProjectFolder)
+                    .WithStandardErrorPipe(CliWrap.PipeTarget.ToStringBuilder(stdErrBuffer))
+                    .WithStandardOutputPipe(CliWrap.PipeTarget.ToStream(Console.OpenStandardOutput()))
+                    .WithValidation(CliWrap.CommandResultValidation.None)
+                    .ExecuteAsync(cancellationTokenSource.Token);
+                if (result.ExitCode != 0)
+                {
+                    Console.WriteLine(stdErrBuffer.ToString());
+                    throw new InvalidOperationException($"The command dotnet test failed. {stdErrBuffer}");
+                }
+            }
+        }
+        catch (OperationCanceledException)
+        {
+            throw new TimeoutException($"The command dotnet test timed out after {timeoutInSeconds} seconds.");
+        }
+
+        var pathToTempCoberturaResults = FileUtils.FindFile(codeCoverageArtifactsFolder, "coverage.cobertura.xml");
+        var pathToTempLineCoverageResults = FileUtils.FindFile(codeCoverageArtifactsFolder, "coverage.info");
+        var pathToFuckedUpTempFolder = Path.GetDirectoryName(pathToTempCoberturaResults);
+
+        FileUtils.Copy(pathToTempCoberturaResults, codeCoverageArtifactsFolder);
+        FileUtils.Copy(pathToTempLineCoverageResults, codeCoverageArtifactsFolder);
+        FileUtils.RemoveDirectory(pathToFuckedUpTempFolder);
+
+        var pathToCoberturaResults = Path.Combine(codeCoverageArtifactsFolder, "coverage.cobertura.xml");
+        CodeCoverageReportGenerator.Generate(pathToCoberturaResults, Path.Combine(codeCoverageArtifactsFolder, "Report"));
+        CheckCoberturaCoverage(pathToCoberturaResults, threshold);
+    }
+
 
     private static void CheckCoberturaCoverage(string reportFile, int threshold)
     {
@@ -320,7 +442,8 @@ public static class DotNet
         foreach (var publishableProject in publishableProjects)
         {
             Command.Execute("dotnet", $"publish {publishableProject} -c release -o {BuildContext.GitHubArtifactsFolder}");
-        };
+        }
+        ;
     }
 }
 

@@ -1,4 +1,4 @@
-#r "nuget:ReportGenerator.Core, 4.8.12"
+#r "nuget: ReportGenerator.Core, 5.5.1"
 using Palmmedia.ReportGenerator.Core;
 
 public static class CodeCoverageReportGenerator
@@ -14,11 +14,13 @@ public static class CodeCoverageReportGenerator
         cliArguments.Add("reports", $"{pathToOpenCoverResult}");
         cliArguments.Add("targetdir", $"{codeCoverageArtifactsFolder}");
         cliArguments.Add("reportTypes", "Cobertura;XmlSummary;Xml;HtmlInline_AzurePipelines_Dark");
+        cliArguments.Add("verbosity", "Off");
 
         var generator = new Generator();
         var settings = new Settings();
         var riskHotspotsAnalysisThresholds = new Palmmedia.ReportGenerator.Core.CodeAnalysis.RiskHotspotsAnalysisThresholds();
         var configuration = new ReportConfigurationBuilder().Create(cliArguments);
+
         generator.GenerateReport(configuration, settings, riskHotspotsAnalysisThresholds);
     }
 }
