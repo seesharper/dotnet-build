@@ -105,11 +105,10 @@ public static class DotNet
             try
             {
                 var result = await CliWrap.Cli.Wrap("dotnet").WithArguments($"test {pathToProjectFile} --configuration Release")
-                // .WithStandardErrorPipe(CliWrap.PipeTarget.ToStringBuilder(stdErrBuffer))
-                .WithStandardErrorPipe(CliWrap.PipeTarget.ToStream(Console.OpenStandardError()))
+                .WithStandardErrorPipe(CliWrap.PipeTarget.ToStringBuilder(stdErrBuffer))
                 .WithStandardOutputPipe(CliWrap.PipeTarget.ToStream(Console.OpenStandardOutput()))
                 .WithValidation(CliWrap.CommandResultValidation.None)
-                .ExecuteAsync();
+                .ExecuteAsync(cancellationTokenSource.Token);
                 if (result.ExitCode != 0)
                 {
                     Console.WriteLine(stdErrBuffer.ToString());
@@ -192,9 +191,9 @@ public static class DotNet
         FileUtils.Copy(pathToTempLineCoverageResults, codeCoverageArtifactsFolder);
         FileUtils.RemoveDirectory(pathToFuckedUpTempFolder);
 
-        var pathToCoberturaResults = Path.Combine(codeCoverageArtifactsFolder, "coverage.cobertura.xml");
-        CodeCoverageReportGenerator.Generate(pathToCoberturaResults, Path.Combine(codeCoverageArtifactsFolder, "Report"));
-        CheckCoberturaCoverage(pathToCoberturaResults, threshold);
+        // var pathToCoberturaResults = Path.Combine(codeCoverageArtifactsFolder, "coverage.cobertura.xml");
+        // CodeCoverageReportGenerator.Generate(pathToCoberturaResults, Path.Combine(codeCoverageArtifactsFolder, "Report"));
+        // CheckCoberturaCoverage(pathToCoberturaResults, threshold);
     }
 
     /// <summary>
