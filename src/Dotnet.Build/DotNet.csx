@@ -191,9 +191,9 @@ public static class DotNet
         FileUtils.Copy(pathToTempLineCoverageResults, codeCoverageArtifactsFolder);
         FileUtils.RemoveDirectory(pathToFuckedUpTempFolder);
 
-        // var pathToCoberturaResults = Path.Combine(codeCoverageArtifactsFolder, "coverage.cobertura.xml");
-        // CodeCoverageReportGenerator.Generate(pathToCoberturaResults, Path.Combine(codeCoverageArtifactsFolder, "Report"));
-        // CheckCoberturaCoverage(pathToCoberturaResults, threshold);
+        var pathToCoberturaResults = Path.Combine(codeCoverageArtifactsFolder, "coverage.cobertura.xml");
+        CodeCoverageReportGenerator.Generate(pathToCoberturaResults, Path.Combine(codeCoverageArtifactsFolder, "Report"));
+        CheckCoberturaCoverage(pathToCoberturaResults, threshold);
     }
 
     /// <summary>
