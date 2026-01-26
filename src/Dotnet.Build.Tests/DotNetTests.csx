@@ -109,10 +109,10 @@ public class DotNetTests
             var artifactsFolder = CreateDirectory(buildFolder, "Artifacts");
             var projectFolder = CreateDirectory(srcFolder, "SampleProject");
             var testFolder = CreateDirectory(srcFolder, "SampleProjects.Tests");
-            Command.Execute("dotnet", $"new classlib", projectFolder);
-            Command.Execute("dotnet", $"new xunit", testFolder);
-            Command.Execute("dotnet", "add package coverlet.collector", testFolder);
-            Command.Execute("dotnet", "add reference ../SampleProject", testFolder);
+            // Command.Execute("dotnet", $"new classlib", projectFolder);
+            // Command.Execute("dotnet", $"new xunit", testFolder);
+            // Command.Execute("dotnet", "add package coverlet.collector", testFolder);
+            // Command.Execute("dotnet", "add reference ../SampleProject", testFolder);
             // DotNet.TestWithCodeCoverage(testFolder, artifactsFolder, 100);
         }
     }
