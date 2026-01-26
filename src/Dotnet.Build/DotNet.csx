@@ -105,7 +105,8 @@ public static class DotNet
             try
             {
                 var result = await CliWrap.Cli.Wrap("dotnet").WithArguments($"test {pathToProjectFile} --configuration Release")
-                .WithStandardErrorPipe(CliWrap.PipeTarget.ToStringBuilder(stdErrBuffer))
+                // .WithStandardErrorPipe(CliWrap.PipeTarget.ToStringBuilder(stdErrBuffer))
+                .WithStandardErrorPipe(CliWrap.PipeTarget.ToStream(Console.OpenStandardError()))
                 .WithStandardOutputPipe(CliWrap.PipeTarget.ToStream(Console.OpenStandardOutput()))
                 .WithValidation(CliWrap.CommandResultValidation.None)
                 .ExecuteAsync(cancellationTokenSource.Token);

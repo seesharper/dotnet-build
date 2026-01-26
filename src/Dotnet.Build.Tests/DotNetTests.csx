@@ -100,22 +100,22 @@ public class DotNetTests
     }
 
     //[OnlyThis]
-    // public void ShouldAnalyzeCodeCoverageUsingCoverletAndReportGenerator()
-    // {
-    //     using (var solutionFolder = new DisposableFolder())
-    //     {
-    //         var srcFolder = CreateDirectory(solutionFolder.Path, "src");
-    //         var buildFolder = CreateDirectory(solutionFolder.Path, "build");
-    //         var artifactsFolder = CreateDirectory(buildFolder, "Artifacts");
-    //         var projectFolder = CreateDirectory(srcFolder, "SampleProject");
-    //         var testFolder = CreateDirectory(srcFolder, "SampleProjects.Tests");
-    //         Command.Execute("dotnet", $"new classlib", projectFolder);
-    //         Command.Execute("dotnet", $"new xunit", testFolder);
-    //         Command.Execute("dotnet", "add package coverlet.collector", testFolder);
-    //         Command.Execute("dotnet", "add reference ../SampleProject", testFolder);
-    //         DotNet.TestWithCodeCoverage(testFolder, artifactsFolder, 100);
-    //     }
-    // }
+    public void ShouldAnalyzeCodeCoverageUsingCoverletAndReportGenerator()
+    {
+        using (var solutionFolder = new DisposableFolder())
+        {
+            var srcFolder = CreateDirectory(solutionFolder.Path, "src");
+            var buildFolder = CreateDirectory(solutionFolder.Path, "build");
+            var artifactsFolder = CreateDirectory(buildFolder, "Artifacts");
+            var projectFolder = CreateDirectory(srcFolder, "SampleProject");
+            var testFolder = CreateDirectory(srcFolder, "SampleProjects.Tests");
+            Command.Execute("dotnet", $"new classlib", projectFolder);
+            Command.Execute("dotnet", $"new xunit", testFolder);
+            Command.Execute("dotnet", "add package coverlet.collector", testFolder);
+            Command.Execute("dotnet", "add reference ../SampleProject", testFolder);
+            DotNet.TestWithCodeCoverage(testFolder, artifactsFolder, 100);
+        }
+    }
 
     //[OnlyThis]
     // public async Task ShouldAnalyzeCodeCoverageAsyncUsingCoverletAndReportGeneratorWithTimeout()
