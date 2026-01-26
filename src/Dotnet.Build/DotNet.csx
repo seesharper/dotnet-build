@@ -109,7 +109,7 @@ public static class DotNet
                 .WithStandardErrorPipe(CliWrap.PipeTarget.ToStream(Console.OpenStandardError()))
                 .WithStandardOutputPipe(CliWrap.PipeTarget.ToStream(Console.OpenStandardOutput()))
                 .WithValidation(CliWrap.CommandResultValidation.None)
-                .ExecuteAsync(cancellationTokenSource.Token);
+                .ExecuteAsync();
                 if (result.ExitCode != 0)
                 {
                     Console.WriteLine(stdErrBuffer.ToString());
