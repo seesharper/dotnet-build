@@ -58,7 +58,7 @@ public static class FileUtils
         {
             return PathType.File;
         }
-        
+
         FileAttributes attr = File.GetAttributes(path);
 
         if ((attr & FileAttributes.Directory) == FileAttributes.Directory)
@@ -78,7 +78,7 @@ public static class FileUtils
         var sourcePathType = GetPathType(sourcePath);
         var targetPathType = GetPathType(targetPath);
         if (sourcePathType == PathType.File)
-        {            
+        {
             if (targetPathType == PathType.Directory)
             {
                 var targetFilePath = Path.Combine(targetPath, Path.GetFileName(sourcePath));
@@ -86,10 +86,10 @@ public static class FileUtils
             }
             else
             {
-                 var targetFolder = Path.GetDirectoryName(targetPath);
+                var targetFolder = Path.GetDirectoryName(targetPath);
                 Directory.CreateDirectory(targetFolder);
                 File.Copy(sourcePath, targetPath, true);
-            }           
+            }
         }
         else
         {
@@ -101,12 +101,12 @@ public static class FileUtils
             }
 
             foreach (var directory in Directory.GetDirectories(sourcePath))
-            {                
+            {
                 var directoryName = Path.GetFileName(directory);
                 if (!excludeFolders.Contains(directoryName))
                 {
                     Copy(directory, Path.Combine(targetPath, Path.GetFileName(directory)), excludeFolders);
-                }                
+                }
             }
         }
     }
@@ -189,7 +189,7 @@ public static class FileUtils
         public DisposableFolder()
         {
             var tempFolder = System.IO.Path.GetTempPath();
-            this.Path = System.IO.Path.Combine(tempFolder, System.IO.Path.GetFileNameWithoutExtension(System.IO.Path.GetTempFileName()));
+            this.Path = System.IO.Path.Combine(tempFolder, Guid.NewGuid().ToString(), System.IO.Path.GetFileNameWithoutExtension(System.IO.Path.GetTempFileName()));
             Directory.CreateDirectory(Path);
         }
 
