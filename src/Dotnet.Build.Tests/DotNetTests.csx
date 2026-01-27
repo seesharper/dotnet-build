@@ -11,7 +11,7 @@ using static FileUtils;
 using System.Xml.Linq;
 using DisposableFolder = FileUtils.DisposableFolder;
 using System.Threading.Tasks;
-await AddTestsFrom<DotNetTests>().AddFilter(m => m.IsDefined(typeof(OnlyThisAttribute), true)).Execute();
+//await AddTestsFrom<DotNetTests>().AddFilter(m => m.IsDefined(typeof(OnlyThisAttribute), true)).Execute();
 
 //await AddTestsFrom<DotNetTests>().Execute();
 
