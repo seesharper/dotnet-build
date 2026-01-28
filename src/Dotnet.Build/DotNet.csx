@@ -320,6 +320,15 @@ public static class DotNet
         }
     }
 
+    public static async Task TestSolutionsWithCodeCoverageAsync(int timeoutInSeconds = 1800)
+    {
+        var solutions = BuildContext.Solutions;
+        foreach (var solution in solutions)
+        {
+            await TestSolutionWithCodeCoverageAsync(solution, BuildContext.ArtifactsFolder, BuildContext.CodeCoverageThreshold, timeoutInSeconds);
+        }
+    }
+
     public static void TestSolutionWithCodeCoverage(string solution, string codeCoverageArtifactsFolder, int threshold)
     {
         var settingsFile = FindFile(Path.GetDirectoryName(solution), "coverlet.runsettings");
@@ -361,12 +370,12 @@ public static class DotNet
         {
             if (settingsFile == null)
             {
-                var args = $"test {solution} -c release --collect:\"XPlat Code Coverage\" --results-directory={codeCoverageArtifactsFolder} -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.ExcludeByAttribute=GeneratedCodeAttribute -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=lcov,cobertura";
+                var args = $"test -c release --collect:\"XPlat Code Coverage\" --results-directory={codeCoverageArtifactsFolder} -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.ExcludeByAttribute=GeneratedCodeAttribute -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=lcov,cobertura";
                 var result = await CliWrap.Cli.Wrap("dotnet").WithArguments(args)
                     .WithWorkingDirectory(Path.GetDirectoryName(solution))
                     .WithStandardErrorPipe(CliWrap.PipeTarget.ToStringBuilder(stdErrBuffer))
-                    .WithStandardOutputPipe(CliWrap.PipeTarget.ToStringBuilder(stdErrBuffer))
-                    .WithValidation(CliWrap.CommandResultValidation.ZeroExitCode)
+                    .WithStandardOutputPipe(CliWrap.PipeTarget.ToStream(Console.OpenStandardOutput()))
+                    .WithValidation(CliWrap.CommandResultValidation.None)
                     .ExecuteAsync(cancellationTokenSource.Token);
                 if (result.ExitCode != 0)
                 {
@@ -380,7 +389,7 @@ public static class DotNet
                 Error.WriteLine($"Found runsettings file at {settingsFile}");
                 var args = $"test {solution} -c release --collect:\"XPlat Code Coverage\" --results-directory={codeCoverageArtifactsFolder} --settings {settingsFile}";
                 var result = await CliWrap.Cli.Wrap("dotnet").WithArguments(args)
-                    .WithWorkingDirectory(BuildContext.RepositoryFolder)
+                    .WithWorkingDirectory(Path.GetDirectoryName(solution))
                     .WithStandardErrorPipe(CliWrap.PipeTarget.ToStringBuilder(stdErrBuffer))
                     .WithStandardOutputPipe(CliWrap.PipeTarget.ToStream(Console.OpenStandardOutput()))
                     .WithValidation(CliWrap.CommandResultValidation.None)
