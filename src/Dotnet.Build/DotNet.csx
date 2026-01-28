@@ -311,6 +311,31 @@ public static class DotNet
         }
     }
 
+    /// <summary>
+    /// Executes all test projects found in <see cref="BuildContext.TestProjects"/> with test coverage.
+    /// </summary>
+    public static async Task TestWithCodeCoverageAsync(int timeoutInSeconds = 1800)
+    {
+        var testprojects = BuildContext.TestProjects;
+        foreach (var testProject in testprojects)
+        {
+            var targetFramework = GetTargetFrameWork(testProject);
+            await TestWithCodeCoverageAsync(Path.GetDirectoryName(testProject), BuildContext.TestCoverageArtifactsFolder, BuildContext.CodeCoverageThreshold, targetFramework, timeoutInSeconds);
+        }
+
+        string GetTargetFrameWork(string pathToProjectFile)
+        {
+            var projectFile = XDocument.Load(pathToProjectFile);
+            var targetFrameworks = projectFile.Descendants("TargetFrameworks").SingleOrDefault()?.Value;
+            if (targetFrameworks != null)
+            {
+                return targetFrameworks.Split(";").First();
+            }
+
+            return null;
+        }
+    }
+
     public static void TestSolutionsWithCodeCoverage()
     {
         var solutions = BuildContext.Solutions;
