@@ -10,7 +10,8 @@ using static ScriptUnit;
 using static FileUtils;
 using System.Xml.Linq;
 using DisposableFolder = FileUtils.DisposableFolder;
-// await AddTestsFrom<DotNetTests>().AddFilter(m => m.IsDefined(typeof(OnlyThisAttribute), true)).Execute();
+using System.Threading.Tasks;
+//await AddTestsFrom<DotNetTests>().AddFilter(m => m.IsDefined(typeof(OnlyThisAttribute), true)).Execute();
 
 //await AddTestsFrom<DotNetTests>().Execute();
 
@@ -99,7 +100,7 @@ public class DotNetTests
         }
     }
 
-    [OnlyThis]
+    //[OnlyThis]
     public void ShouldAnalyzeCodeCoverageUsingCoverletAndReportGenerator()
     {
         using (var solutionFolder = new DisposableFolder())
@@ -184,7 +185,7 @@ public class DotNetTests
     }
 
 
-    [OnlyThis]
+    //[OnlyThis]
     public void ShouldReport100PercentCodeCoverageWithCodeAnnotatedWithGeneratedCodeAttribute()
     {
         using (var solutionFolder = new DisposableFolder())
@@ -209,8 +210,8 @@ public class DotNetTests
         }
     }
 
-    //[OnlyThis]
-    public void ShouldReport100PercentCodeCoverageForSolutionWithCoverageSplitAcrossMultipleProjects()
+    [OnlyThis]
+    public async Task ShouldReport100PercentCodeCoverageForSolutionWithCoverageSplitAcrossMultipleProjects()
     {
         using (var rootFolder = new DisposableFolder())
         {
@@ -244,7 +245,114 @@ public class DotNetTests
             var secondTestSourceFilePath = Path.Combine(secondTestProjectFolder, "SecondTestableClassTests.cs");
             Copy(Path.Combine(templatesFolder, "SecondTestableClassTests.template"), secondTestSourceFilePath);
 
-            DotNet.TestSolutionWithCodeCoverage(Path.Combine(srcFolder, "src.slnx"), artifactsFolder, 100);
+            await DotNet.TestSolutionWithCodeCoverageAsync(Path.Combine(srcFolder, "src.slnx"), artifactsFolder, 100);
+        }
+    }
+
+    //[OnlyThis]
+    public async Task ShouldAnalyzeSolutionCodeCoverageAsyncWithTimeout()
+    {
+        var content = """
+        namespace Testing;
+
+        public class UnitTest1
+        {
+            [Fact]
+            public async Task Test1()
+            {
+                await Task.Delay(2000);
+                Assert.True(true);
+            }
+        }
+        """;
+
+        using (var rootFolder = new DisposableFolder())
+        {
+            BuildContext.CodeCoverageThreshold = 100;
+            var srcFolder = CreateDirectory(rootFolder.Path, "src");
+            var buildFolder = CreateDirectory(rootFolder.Path, "build");
+            var artifactsFolder = CreateDirectory(buildFolder, "Artifacts");
+            var firstProjectFolder = CreateDirectory(srcFolder, "SampleProject1");
+            var secondProjectFolder = CreateDirectory(srcFolder, "SampleProject2");
+            var firstTestProjectFolder = CreateDirectory(srcFolder, "SampleProject1.Tests");
+            var secondTestProjectFolder = CreateDirectory(srcFolder, "SampleProject2.Tests");
+            await Command.ExecuteAsync("dotnet", "new classlib", firstProjectFolder);
+            await Command.ExecuteAsync("dotnet", "new classlib", secondProjectFolder);
+            await Command.ExecuteAsync("dotnet", "add reference ../SampleProject1", secondProjectFolder);
+            await Command.ExecuteAsync("dotnet", "new xunit", firstTestProjectFolder);
+            await Command.ExecuteAsync("dotnet", "add reference ../SampleProject1", firstTestProjectFolder);
+            await Command.ExecuteAsync("dotnet", "new xunit", secondTestProjectFolder);
+            await Command.ExecuteAsync("dotnet", "add reference ../SampleProject2", secondTestProjectFolder);
+            await Command.ExecuteAsync("dotnet", "new sln", srcFolder);
+            await Command.ExecuteAsync("dotnet", "sln add SampleProject1", srcFolder);
+            await Command.ExecuteAsync("dotnet", "sln add SampleProject2", srcFolder);
+            await Command.ExecuteAsync("dotnet", "sln add SampleProject1.Tests", srcFolder);
+            await Command.ExecuteAsync("dotnet", "sln add SampleProject2.Tests", srcFolder);
+            var templatesFolder = Path.Combine(GetScriptFolder(), "templates");
+            var firstSourceFilePath = Path.Combine(firstProjectFolder, "FirstTestableClass.cs");
+            Copy(Path.Combine(templatesFolder, "FirstTestableClass.template"), firstSourceFilePath);
+            var secondSourceFilePath = Path.Combine(secondProjectFolder, "SecondTestableClass.cs");
+            Copy(Path.Combine(templatesFolder, "SecondTestableClass.template"), secondSourceFilePath);
+            File.Delete(Path.Combine(firstTestProjectFolder, "UnitTest1.cs"));
+            File.WriteAllText(Path.Combine(firstTestProjectFolder, "UnitTest1.cs"), content);
+            var secondTestSourceFilePath = Path.Combine(secondTestProjectFolder, "SecondTestableClassTests.cs");
+            Copy(Path.Combine(templatesFolder, "SecondTestableClassTests.template"), secondTestSourceFilePath);
+
+            await DotNet.TestSolutionWithCodeCoverageAsync(Path.Combine(srcFolder, "src.slnx"), artifactsFolder, 50);
+        }
+    }
+
+    //[OnlyThis]
+    public async Task ShouldAnalyzeSolutionCodeCoverageAsyncWithExceededTimeout()
+    {
+        var content = """
+        namespace Testing;
+
+        public class UnitTest1
+        {
+            [Fact]
+            public async Task Test1()
+            {
+                await Task.Delay(2000);
+                Assert.True(true);
+            }
+        }
+        """;
+
+        using (var rootFolder = new DisposableFolder())
+        {
+            BuildContext.CodeCoverageThreshold = 100;
+            var srcFolder = CreateDirectory(rootFolder.Path, "src");
+            var buildFolder = CreateDirectory(rootFolder.Path, "build");
+            var artifactsFolder = CreateDirectory(buildFolder, "Artifacts");
+            var firstProjectFolder = CreateDirectory(srcFolder, "SampleProject1");
+            var secondProjectFolder = CreateDirectory(srcFolder, "SampleProject2");
+            var firstTestProjectFolder = CreateDirectory(srcFolder, "SampleProject1.Tests");
+            var secondTestProjectFolder = CreateDirectory(srcFolder, "SampleProject2.Tests");
+            await Command.ExecuteAsync("dotnet", "new classlib", firstProjectFolder);
+            await Command.ExecuteAsync("dotnet", "new classlib", secondProjectFolder);
+            await Command.ExecuteAsync("dotnet", "add reference ../SampleProject1", secondProjectFolder);
+            await Command.ExecuteAsync("dotnet", "new xunit", firstTestProjectFolder);
+            await Command.ExecuteAsync("dotnet", "add reference ../SampleProject1", firstTestProjectFolder);
+            await Command.ExecuteAsync("dotnet", "new xunit", secondTestProjectFolder);
+            await Command.ExecuteAsync("dotnet", "add reference ../SampleProject2", secondTestProjectFolder);
+            await Command.ExecuteAsync("dotnet", "new sln", srcFolder);
+            await Command.ExecuteAsync("dotnet", "sln add SampleProject1", srcFolder);
+            await Command.ExecuteAsync("dotnet", "sln add SampleProject2", srcFolder);
+            await Command.ExecuteAsync("dotnet", "sln add SampleProject1.Tests", srcFolder);
+            await Command.ExecuteAsync("dotnet", "sln add SampleProject2.Tests", srcFolder);
+            var templatesFolder = Path.Combine(GetScriptFolder(), "templates");
+            var firstSourceFilePath = Path.Combine(firstProjectFolder, "FirstTestableClass.cs");
+            Copy(Path.Combine(templatesFolder, "FirstTestableClass.template"), firstSourceFilePath);
+            var secondSourceFilePath = Path.Combine(secondProjectFolder, "SecondTestableClass.cs");
+            Copy(Path.Combine(templatesFolder, "SecondTestableClass.template"), secondSourceFilePath);
+            File.Delete(Path.Combine(firstTestProjectFolder, "UnitTest1.cs"));
+            File.WriteAllText(Path.Combine(firstTestProjectFolder, "UnitTest1.cs"), content);
+            var secondTestSourceFilePath = Path.Combine(secondTestProjectFolder, "SecondTestableClassTests.cs");
+            Copy(Path.Combine(templatesFolder, "SecondTestableClassTests.template"), secondTestSourceFilePath);
+
+            var act = async () => await DotNet.TestSolutionWithCodeCoverageAsync(Path.Combine(srcFolder, "src.slnx"), artifactsFolder, 100, 1);
+            await act.Should().ThrowAsync<TimeoutException>();
         }
     }
 

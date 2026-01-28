@@ -350,6 +350,68 @@ public static class DotNet
         }
     }
 
+    public static async Task TestSolutionWithCodeCoverageAsync(string solution, string codeCoverageArtifactsFolder, int threshold, int timeoutInSeconds = 1800)
+    {
+        var cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(timeoutInSeconds));
+
+        var settingsFile = FindFile(Path.GetDirectoryName(solution), "coverlet.runsettings");
+        var stdErrBuffer = new StringBuilder();
+
+        try
+        {
+            if (settingsFile == null)
+            {
+                var args = $"test {solution} -c release --collect:\"XPlat Code Coverage\" --results-directory={codeCoverageArtifactsFolder} -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.ExcludeByAttribute=GeneratedCodeAttribute -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=lcov,cobertura";
+                var result = await CliWrap.Cli.Wrap("dotnet").WithArguments(args)
+                    .WithWorkingDirectory(Path.GetDirectoryName(solution))
+                    .WithStandardErrorPipe(CliWrap.PipeTarget.ToStringBuilder(stdErrBuffer))
+                    .WithStandardOutputPipe(CliWrap.PipeTarget.ToStringBuilder(stdErrBuffer))
+                    .WithValidation(CliWrap.CommandResultValidation.ZeroExitCode)
+                    .ExecuteAsync(cancellationTokenSource.Token);
+                if (result.ExitCode != 0)
+                {
+                    var error = stdErrBuffer.ToString();
+                    Console.WriteLine(stdErrBuffer.ToString());
+                    throw new InvalidOperationException($"The command dotnet test failed. {stdErrBuffer}");
+                }
+            }
+            else
+            {
+                Error.WriteLine($"Found runsettings file at {settingsFile}");
+                var args = $"test {solution} -c release --collect:\"XPlat Code Coverage\" --results-directory={codeCoverageArtifactsFolder} --settings {settingsFile}";
+                var result = await CliWrap.Cli.Wrap("dotnet").WithArguments(args)
+                    .WithWorkingDirectory(BuildContext.RepositoryFolder)
+                    .WithStandardErrorPipe(CliWrap.PipeTarget.ToStringBuilder(stdErrBuffer))
+                    .WithStandardOutputPipe(CliWrap.PipeTarget.ToStream(Console.OpenStandardOutput()))
+                    .WithValidation(CliWrap.CommandResultValidation.None)
+                    .ExecuteAsync(cancellationTokenSource.Token);
+                if (result.ExitCode != 0)
+                {
+                    Console.WriteLine(stdErrBuffer.ToString());
+                    throw new InvalidOperationException($"The command dotnet test failed. {stdErrBuffer}");
+                }
+            }
+        }
+        catch (OperationCanceledException)
+        {
+            throw new TimeoutException($"The command dotnet test timed out after {timeoutInSeconds} seconds.");
+        }
+
+        var options = new EnumerationOptions();
+        options.MatchCasing = MatchCasing.CaseInsensitive;
+        options.RecurseSubdirectories = true;
+        var coberturaResultPaths = Directory.GetFiles(codeCoverageArtifactsFolder, "coverage.cobertura.xml", options);
+        var coberturaResults = string.Join(';', coberturaResultPaths);
+        var reportsPath = Path.Combine(codeCoverageArtifactsFolder, "Report");
+
+        CodeCoverageReportGenerator.Generate(coberturaResults, reportsPath);
+        CheckCoberturaCoverage(Path.Combine(reportsPath, "Cobertura.xml"), threshold);
+        foreach (var result in coberturaResultPaths)
+        {
+            RemoveDirectory(Path.GetDirectoryName(result));
+        }
+    }
+
     public static void Pack()
     {
         foreach (var packableProject in BuildContext.PackableProjects)
