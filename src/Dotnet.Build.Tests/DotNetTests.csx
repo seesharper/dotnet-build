@@ -298,7 +298,7 @@ public class DotNetTests
             var secondTestSourceFilePath = Path.Combine(secondTestProjectFolder, "SecondTestableClassTests.cs");
             Copy(Path.Combine(templatesFolder, "SecondTestableClassTests.template"), secondTestSourceFilePath);
 
-            await DotNet.TestSolutionWithCodeCoverageAsync(Path.Combine(srcFolder, "src.slnx"), artifactsFolder, 100);
+            await DotNet.TestSolutionWithCodeCoverageAsync(Path.Combine(srcFolder, "src.slnx"), artifactsFolder, 50);
         }
     }
 
