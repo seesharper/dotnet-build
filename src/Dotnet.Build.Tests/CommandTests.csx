@@ -66,11 +66,20 @@ public class CommandTests
         TestContext.StandardError.Should().NotBeEmpty();
     }
 
-    [OnlyThis]
     public void ShouldNotThrowWhenExitCodeIsSuccessful()
     {
         var result = Command.Capture("dotnet", "--info");
         result.Invoking(r => r.EnsureSuccessfulExitCode()).Should().NotThrow();
+    }
+
+    [OnlyThis]
+    public void ShouldPassStdinToCommand()
+    {
+        var StandardInCommand = System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Windows) ? "findstr" : "grep";
+        var secretValue = "supersecretpassword123";
+        var result = Command.Capture(StandardInCommand, "secret", stdin: secretValue);
+        result.StandardOut.Should().Contain(secretValue);
+        result.ExitCode.Should().Be(0);
     }
 
     // public void ShouldThrowWhenExitCodeIsSuccessful()

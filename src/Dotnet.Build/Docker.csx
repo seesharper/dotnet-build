@@ -12,7 +12,7 @@ public static class Docker
         var username = Environment.GetEnvironmentVariable("DOCKERHUB_USERNAME");
         var password = Environment.GetEnvironmentVariable("DOCKERHUB_PASSWORD");
 
-        await Command.ExecuteAsync("docker", $"login --username {username} --password {password}", workingDirectory);
+        await Command.ExecuteAsync("docker", $"login --username {username} --password-stdin", workingDirectory, stdin: password);
         await Command.ExecuteAsync("docker", $@"push {repository}:{tag}", workingDirectory);
     }
 }
