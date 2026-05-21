@@ -454,6 +454,13 @@ public static class DotNet
         }
     }
 
+    public static async Task PackAsync()
+    {
+        foreach (var packableProject in BuildContext.PackableProjects)
+        {
+            await PackAsync(Path.GetDirectoryName(packableProject), BuildContext.NuGetArtifactsFolder, BuildContext.CurrentShortCommitHash);
+        }
+    }
 
     public static void Pack(string pathToProjectFolder, string pathToPackageOutputFolder, string commitHash = "")
     {
@@ -475,6 +482,27 @@ public static class DotNet
 
 
         Command.Execute("dotnet", $"pack {pathToProjectFile} --configuration Release --output {pathToPackageOutputFolder} {commitHash} {versionProperty}");
+    }
+
+    public static async Task PackAsync(string pathToProjectFolder, string pathToPackageOutputFolder, string commitHash = "")
+    {
+        if (!string.IsNullOrWhiteSpace(commitHash))
+        {
+            commitHash = $" /property:CommitHash={commitHash} ";
+        }
+
+        string pathToProjectFile = FindProjectFile(pathToProjectFolder);
+
+        var document = XDocument.Load(pathToProjectFile);
+        var version = document.Descendants("Version").SingleOrDefault()?.Value;
+        if (string.IsNullOrWhiteSpace(version))
+        {
+            version = BuildContext.LatestTag;
+        }
+
+        var versionProperty = $" /property:Version={version.Replace("v", string.Empty, StringComparison.OrdinalIgnoreCase)} ";
+
+        await Command.ExecuteAsync("dotnet", $"pack {pathToProjectFile} --configuration Release --output {pathToPackageOutputFolder} {commitHash} {versionProperty}");
     }
 
     public static void Push(string packagesFolder, string source = DefaultSource)
